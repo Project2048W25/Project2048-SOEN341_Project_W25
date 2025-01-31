@@ -6,9 +6,9 @@ A platform for communication with safe messaging through direct messaging and mu
 Whether collaborating within teams, community networking, or chatting privately with friends. ChatHaven offers a minimalist platform to stay connected. Users can create channels to communicate through teams, engage in one-on-one conversations, while all enjoying customizable features that enhance the experience. With the privacy options, ChatHaven is a safe platform for all ages. 
 
 
-**Team Members**
-Gloria 
-Bertin 
-Kevin 
-Khaled 
-Vedang 
+**Team Members**\
+Gloria \
+Bertin \
+Kevin \
+Khaled \
+Vedang \
