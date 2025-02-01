@@ -7,9 +7,9 @@ Whether collaborating within teams, community networking, or chatting privately 
 
 
 **Team Members**\
-Gloria \
-Bertin \
-Kevin \
-Khaled \
-Vedang \
-William
+Gloria - frontend\
+Bertin - frontend \
+Kevin - backend\
+Khaled - frontend \
+Vedang - backend\
+William - backend
