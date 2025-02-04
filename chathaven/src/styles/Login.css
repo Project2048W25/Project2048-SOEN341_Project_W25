@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+.container {
+    @apply overflow-hidden pt-28 pr-3 pb-11 pl-16 bg-stone-950 min-h-screen;
+}
+
+.content {
+    @apply flex gap-5 max-w-7xl mx-auto;
+}
+
+.welcomeSection {
+    @apply flex flex-col w-[61%];
+}
+
+.welcomeText {
+    @apply flex flex-col self-stretch my-auto w-full font-semibold text-white;
+}
+
+.title {
+    @apply mr-20 text-8xl;
+}
+
+.tagline {
+    @apply flex flex-wrap gap-3 ml-6 text-3xl;
+}
+
+.taglineBox {
+    @apply px-6 py-3.5 border-4 border-white;
+}
+
+.taglineDivider {
+    @apply shrink-0 my-auto max-w-full h-0.5 border-2 border-dashed border-neutral-600 w-[561px];
+}
+
+.formSection {
+    @apply flex flex-col ml-5 w-[39%];
+}
+
+.formContainer {
+    @apply flex overflow-hidden z-10 flex-col justify-end px-10 pt-24 pb-12 max-w-full rounded-3xl border border-solid shadow-sm backdrop-blur-[26.5px] bg-[linear-gradient(321deg,rgba(191,191,191,0.06)_5.98%,rgba(0,0,0,0.00)_66.28%),rgba(0,0,0,0.14)] border-zinc-400 w-[480px];
+}
+
+.form {
+    @apply flex flex-col items-center w-full text-white;
+}
+
+.formHeader {
+    @apply flex flex-col self-start mb-8;
+}
+
+.formFields {
+    @apply flex flex-col w-full max-w-[400px] gap-6;
+}
+
+.loginButton {
+    @apply w-full py-3.5 px-2.5 text-xl font-semibold rounded-xl bg-white text-black hover:bg-gray-100 transition-colors;
+}
+
+.forgotPassword {
+    @apply text-base font-medium hover:underline mt-3;
+}
+
+.socialLogin {
+    @apply flex flex-col items-center mt-12 w-full;
+}
+
+.divider {
+    @apply flex items-center gap-5 text-neutral-600 w-full;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    @apply flex-1 h-0.5 border-t-2 border-neutral-600;
+}
+
+.socialButtons {
+    @apply flex gap-5 justify-center mt-3;
+}
+
+.footer {
+    @apply flex flex-col items-center mt-24 w-full text-base;
+}
+
+.footerLinks {
+    @apply flex gap-8 justify-between items-center px-1.5 py-1 mt-2 w-full;
+}
+
+@media (max-width: 768px) {
+    .container {
+        @apply pt-24 pl-5;
+    }
+
+    .content {
+        @apply flex-col;
+    }
+
+    .welcomeSection,
+    .formSection {
+        @apply w-full ml-0;
+    }
+
+    .title {
+        @apply text-4xl mr-2.5;
+    }
+
+    .formContainer {
+        @apply px-5;
+    }
+}
