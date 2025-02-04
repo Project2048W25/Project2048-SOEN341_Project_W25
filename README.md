@@ -2,8 +2,7 @@
 
 ## Description
 
-A platform for communication with safe messaging through direct messaging and multiple team members. ChatHaven is the new multi-function multi-function communication platform designed for seamless interaction through private messaging and text channels within groups. 
-Whether collaborating within teams, community networking, or chatting privately with friends. ChatHaven offers a minimalist platform to stay connected. Users can create channels to communicate through teams, engage in one-on-one conversations, while all enjoying customizable features that enhance the experience. With the privacy options, ChatHaven is a safe platform for all ages. 
+Finding a secure and minimal platform for both team collaboration and private messaging can be challenging. Many that do exist lack moderated chats and  customizable features for quality communication. ChatHaven provides a secure and user-friendly communication platform designed for seamless interaction. Whether working in teams, community networking, direct messaging with friends, users benefit from the clean interface, media-sharing capabilities, and many more features to come. Built with safety and privacy in mind, ChatHaven is safe for all ages. 
 
 ## Features
 
@@ -19,7 +18,7 @@ Whether collaborating within teams, community networking, or chatting privately 
 
 | Name | Student ID| Role |
 |----------|----------|----------|
-| Gloria    |    | Front-end   |
+| Gloria    | 40211953   | Front-end   |
 | Bertin    |   | Front-end  |
 | Kevin    | 40283037 | Backend |
 | Khaled    |    | Front-end    |
