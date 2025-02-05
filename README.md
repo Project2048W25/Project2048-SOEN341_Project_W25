@@ -19,12 +19,12 @@ Whether collaborating within teams, community networking, or chatting privately 
 
 | Name | Student ID| Role |
 |----------|----------|----------|
-| Gloria    |    | Front-end   |
+| Gloria    |   40211953 | Front-end   |
 | Bertin   | 40157663 | Front-end  |
 | Kevin    | 40283037 | Backend |
 | Khaled    |    | Front-end    |
-| Vedang    |   | Backend   |
-| William    |  | Backend   |
+| Vedang    |  40202302 | Backend   |
+| William    | 40215391 | Backend   |
 
 ## Technologies Used
 - React
