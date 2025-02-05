@@ -19,7 +19,7 @@ Whether collaborating within teams, community networking, or chatting privately 
 
 | Name | Student ID| Role |
 |----------|----------|----------|
-| Gloria    |    | Front-end   |
+| Gloria    |  40211953  | Front-end   |
 | Bertin   | 40157663 | Front-end  |
 | Kevin    | 40283037 | Backend |
 | Khaled    |    | Front-end    |
