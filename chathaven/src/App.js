@@ -1,32 +1,35 @@
 import logo from './logo.svg';
+import {Routes, Route, BrowserRouter, useInRouterContext} from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 import './App.css';
-// import Login from "./components/Login";
-import {Login} from "./components/Login";
-function App() {
-  // return (
-  //   <div className="App">
-  //     <header className="App-header">
-  //       <img src={logo} className="App-logo" alt="logo" />
-  //       <p>
-  //         Edit <code>src/App.js</code> and save to reload.
-  //       </p>
-  //       <a
-  //         className="App-link"
-  //         href="https://reactjs.org"
-  //         target="_blank"
-  //         rel="noopener noreferrer"
-  //       >
-  //         Learn React
-  //       </a>
-  //     </header>
-  //   </div>
-  // );
-  return (
+import {Login} from "./Pages/Login";
+import {Dashboard} from "./Pages/Dashboard";
+import {Signup} from "./Pages/Signup";
+import {Forgot} from "./Pages/Forgot";
 
-      // show the login form .Login.jsx
-      <Login />
+    function App() {
+      return (
+      <>
+          <head>
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+            <title>{'ChatHaven'}</title>
+            <link rel="stylesheet" href="styles.css"/>
+            <link rel="icon" type="image/x-icon" href= {logo} />
+            </head>
 
-  );
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard/>}/>
+          <Route path="/signup" element={<Signup/>}/>
+          <Route path="/forgot" element={<Forgot/>}/>
+        </Routes>
+</BrowserRouter>
+</>
+)
+  ;
 }
 
 export default App;
