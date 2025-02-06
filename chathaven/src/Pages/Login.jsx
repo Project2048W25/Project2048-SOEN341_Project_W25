@@ -119,17 +119,18 @@ export const Login = () => {
                                             />
                                             </div>
                                             <div className="inline-flex flex-col items-start gap-3 relative flex-[0_0_auto]">
-
                                                 <div className="inline-flex items-center gap-1 relative flex-[0_0_auto]">
-                                                    <img
+                                                    <input
+                                                        type="checkbox"
+                                                        id="remember_me"
                                                         className="relative w-[18px] h-[18px]"
-                                                        alt="Fluent checkbox"
-                                                        src={fluentCheckboxChecked16Filled}
                                                     />
-
-                                                    <div className="relative w-fit mt-[-1.00px] [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-white text-base tracking-[0] leading-[normal]">
+                                                    <label
+                                                        htmlFor="remember_me"
+                                                        className="relative w-fit mt-[-1.00px] [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-white text-base tracking-[0] leading-[normal]"
+                                                    >
                                                         Remember me
-                                                    </div>
+                                                    </label>
                                                 </div>
                                             </div>
 
