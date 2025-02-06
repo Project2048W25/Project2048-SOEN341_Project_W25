@@ -7,6 +7,7 @@ import google_icon from "../icons/devicon_google.svg";
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 
+
 export const Signup = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -105,7 +106,7 @@ export const Signup = () => {
                                                 required
                                             />
                                             {!passwordMatch && (
-                                                <div className="text-red-500 [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-base tracking-[0] leading-[normal]">
+                                                <div className="text-red-250 [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-base tracking-[0] leading-[normal]">
                                                     Passwords do not match
                                                 </div>
                                             )}
