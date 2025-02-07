@@ -10,3 +10,4 @@
 - Khaled: https://docs.google.com/spreadsheets/d/1EKvsqVRBaSX1DFs57lT8jeUZ6H0vqdmIFBoCAv4oTWk/edit?gid=0#gid=0
 - Vedang: https://docs.google.com/spreadsheets/d/1vUmVpkwUBdEZxaVws8o5-YLHAHgtaYevhZqKfP-IZ5M/edit?gid=0#gid=0
 - Bertin: [Individual contribution Sprint - 40157663 Bertin Mihigo Sano](https://docs.google.com/spreadsheets/d/1Z-h-tQ6vK6P6O0AtdJZ2BDSGmKTBYzHoK-K_ev3toa4/edit?usp=sharing)
+- William: https://docs.google.com/spreadsheets/d/1UuTYQhYF_1EFcf-IG4y4pGTI6p7Sgy5e0A3sa2wzwec/edit?usp=sharing
