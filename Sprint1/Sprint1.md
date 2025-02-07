@@ -10,3 +10,5 @@ Kevin: https://docs.google.com/spreadsheets/d/1LcGu7HJpOtKVtVjXwLut29XzIOo3WjIKi
 Gloria: https://docs.google.com/document/d/1VkxFQKOZHicQMTMiBbE5MKHcWz0NDlz1KFcwVt9PJHA/edit?usp=sharing
 
 Khaled: https://docs.google.com/spreadsheets/d/1EKvsqVRBaSX1DFs57lT8jeUZ6H0vqdmIFBoCAv4oTWk/edit?gid=0#gid=0
+
+Vedang: https://docs.google.com/spreadsheets/d/1vUmVpkwUBdEZxaVws8o5-YLHAHgtaYevhZqKfP-IZ5M/edit?gid=0#gid=0
