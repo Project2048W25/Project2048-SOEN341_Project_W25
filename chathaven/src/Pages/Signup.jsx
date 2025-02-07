@@ -112,38 +112,36 @@ export const Signup = () => {
                                                 type="password"
                                                 required={true}
                                             />
-
                                             {/* User Type Selection */}
-                                            <div className="flex justify-center gap-4 mt-4">
-                                                <button
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    onClick={() => setUserType("Member")}
-                                                    className={`flex w-[200px] items-start justify-center gap-2.5 px-4 py-3.5 relative ${
-                                                        userType === "Member"
-                                                            ? "border border-solid border-white"
-                                                            : "bg-[#2836d7] rounded-xl border border-solid border-black"
-                                                    }`}        
-                                                >
-                                                    <div className="relative w-fit mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-white text-xl tracking-[0] leading-[normal]">
-                                                        Member
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    onClick={() => setUserType("Admin")}
-                                                    className={`flex w-[200px] items-start justify-center gap-2.5 px-4 py-3.5 relative ${
-                                                        userType === "Admin"
-                                                        ? "border border-solid border-white"
-                                                        : "bg-[#2836d7] border border-solid border-black"
-                                                    }`}
-                                                    >
-                                                    <div className="relative w-fit mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-white text-xl tracking-[0] leading-[normal]">
-                                                        Admin
-                                                    </div>
-                                                </div>
-                                            </div>
+<div className="flex justify-center gap-4 mt-4">
+    <button
+        role="button"
+        tabIndex={0}
+        onClick={() => setUserType("Member")}
+        className={`w-[200px] py-3.5 rounded-xl font-semibold transition-all transform duration-300 ease-in-out shadow-md text-lg flex items-center justify-center
+            ${userType === "Member" 
+                ? "bg-gradient-to-r from-green-400 to-green-600 text-white scale-105 border-2 border-green-300"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600"
+            }`}
+    >
+        Member
+    </button>
+
+    <button
+        role="button"
+        tabIndex={0}
+        onClick={() => setUserType("Admin")}
+        className={`w-[200px] py-3.5 rounded-xl font-semibold transition-all transform duration-300 ease-in-out shadow-md text-lg flex items-center justify-center
+            ${userType === "Admin" 
+                ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white scale-105 border-2 border-blue-300"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600"
+            }`}
+    >
+        Admin
+    </button>
+</div>
+
+    
 
 
 
