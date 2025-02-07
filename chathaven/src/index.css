@@ -1,13 +1,125 @@
-body {
+/* 🌟 General Styles */
+body, html {
+  height: 100%;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  background: linear-gradient(180deg, #121212 0%, #0b0b0b 50%, #050505 100%);
+  background-attachment: fixed;
+  background-size: cover;
+  color: white;
+  font-family: 'Noto Sans', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* 🔹 Container Styles */
+.auth-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🌟 Glassmorphism Card for Forms */
+.auth-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* 🔹 Input Fields */
+.auth-card input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 16px;
+}
+
+/* Placeholder text */
+.auth-card input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+
+
+
+
+
+/* 🔹 Signup & Login Buttons */
+.auth-button {
+  width: 100%;
+  background: linear-gradient(180deg, #5a3fff 0%, #3b0b8a 100%);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.3s;
+  margin-top: 10px;
+}
+
+.auth-button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* 🔹 Social Login Button */
+.google-login {
+  background: white;
+  color: #333;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.google-login img {
+  width: 20px;
+  margin-right: 10px;
+}
+
+.google-login:hover {
+  transform: scale(1.05);
+}
+
+/* 🔹 Responsive Design */
+@media (max-width: 600px) {
+  .auth-card {
+    width: 95%;
+    padding: 20px;
+  }
+}
+
+/* Fancy button effects */
+button {
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Selected button gets a glow effect */
+button.scale-105 {
+  box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Hover effect for unselected buttons */
+button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
 }
