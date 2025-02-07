@@ -20,10 +20,10 @@ Finding a secure and minimal platform for both team collaboration and private me
 |----------|----------|----------|
 | Gloria    |   40211953 | Front-end   |
 | Bertin   | 40157663 | Front-end  |
-| Kevin    | 40283037 | Backend |
+| Kevin    | 40283037 | Full-stack |
 | Khaled    |  40231852  | Front-end    |
-| Vedang    |  40202302 | Backend   |
-| William    | 40215391 | Backend   |
+| Vedang    |  40202302 | Back-end   |
+| William    | 40215391 | Back-end   |
 
 ## Technologies Used
 - React
@@ -37,7 +37,7 @@ Gloria Teta (40211953): Computer engineering student passionate about coding and
 
 Bertin Mihigo Sano (41057663): Computer Engineering major with expertise in programming and design. Currently focused on front-end development to enhance user experience and interface efficiency.
 
-Kevin Tran (40283037): A Software Engineer that is specialized in back-end. Passionate about bringing functionalities to life and ensure the smooth deployment of the web app. Responsible to ensure the back-end aligns with the front-end seamlessly using mainly Supabase in a Nodejs environment. Focus on maintanable and reliable code to ensure safety of user's privacy of data and effiency of queries and requests made from both ends for desired results.
+Kevin Tran (40283037): A Software Engineer that is experienced in full-stack. Passionate about bringing functionalities to life and ensure the smooth deployment of the web app through professional and enjoyable pleasant visuals. Responsible to ensure the back-end aligns with the front-end seamlessly in the Nodejs environment. Focus on maintanable and reliable code to ensure safety of user's privacy of data and effiency of queries and requests made from both ends for desired results.
 
 Khaled Daoud (40231852): Software Engineering student learning front-end UI/UX. Familiar with Java and JavaScript, and aspiring to learn more about front-end tools like React.js and CSS.
 
