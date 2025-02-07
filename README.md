@@ -22,7 +22,7 @@ Whether collaborating within teams, community networking, or chatting privately 
 | Gloria    |   40211953 | Front-end   |
 | Bertin   | 40157663 | Front-end  |
 | Kevin    | 40283037 | Backend |
-| Khaled    |    | Front-end    |
+| Khaled    |  40231852  | Front-end    |
 | Vedang    |  40202302 | Backend   |
 | William    | 40215391 | Backend   |
 
