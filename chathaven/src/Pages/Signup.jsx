@@ -120,11 +120,11 @@ export const Signup = () => {
                                                     onClick={() => setUserType("Member")}
                                                     className={`flex w-[200px] items-start justify-center gap-2.5 px-4 py-3.5 relative ${
                                                         userType === "Member"
-                                                            ? "bg-[#2836d7] rounded-xl border border-solid border-black"
-                                                            : "border border-solid border-white"
+                                                            ? "border border-solid border-white"
+                                                            : "bg-[#2836d7] rounded-xl border border-solid border-black"
                                                     }`}        
                                                 >
-                                                    <div className="relative w-fit mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-[#fffefe] text-xl tracking-[0] leading-[normal]">
+                                                    <div className="relative w-fit mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-white text-xl tracking-[0] leading-[normal]">
                                                         Member
                                                     </div>
                                                 </div>
@@ -134,8 +134,8 @@ export const Signup = () => {
                                                     onClick={() => setUserType("Admin")}
                                                     className={`flex w-[200px] items-start justify-center gap-2.5 px-4 py-3.5 relative ${
                                                         userType === "Admin"
-                                                        ? "bg-[#2836d7] border border-solid border-black"
-                                                        : "border border-solid border-white"
+                                                        ? "border border-solid border-white"
+                                                        : "bg-[#2836d7] border border-solid border-black"
                                                     }`}
                                                     >
                                                     <div className="relative w-fit mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-white text-xl tracking-[0] leading-[normal]">
