@@ -12,7 +12,87 @@
     --color-red-200: oklch(0.885 0.062 18.334);
     --color-red-300: oklch(0.808 0.114 19.571);
     --color-red-400: oklch(0.704 0.191 22.216);
-    --color-red-500: oklch(0.637 0.237 25.331);
+    --color-red-500: oklch(0.637 0.237 25.331);/* Ensure background expands dynamically */
+    body, html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(180deg, #121212 0%, #0b0b0b 50%, #050505 100%);
+      background-attachment: fixed;
+      background-size: cover;
+      color: white;
+      font-family: 'Noto Sans', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    /* Login container to center elements */
+    .login-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    /* Login form card with blur effect */
+    .login-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(15px);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    
+    /* Input fields */
+    .login-card input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 16px;
+    }
+    
+    /* Placeholder styling */
+    .login-card input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    /* Login button */
+    .login-button {
+      width: 100%;
+      background: linear-gradient(180deg, #5a3fff 0%, #3b0b8a 100%);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.3s;
+      margin-top: 10px;
+    }
+    
+    .login-button:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .login-card {
+        width: 95%;
+        padding: 20px;
+      }
+    }
+    
     --color-red-600: oklch(0.577 0.245 27.325);
     --color-red-700: oklch(0.505 0.213 27.518);
     --color-red-800: oklch(0.444 0.177 26.899);

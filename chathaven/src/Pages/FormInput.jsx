@@ -1,5 +1,4 @@
 import * as React from "react";
-
 function FormInput({ type, id, placeholder, label, icon }) {
     return (
         <div className="relative">
