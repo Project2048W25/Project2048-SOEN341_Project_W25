@@ -3,12 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@supabase/supabase-js": "^2.48.1",
     "@react-oauth/google": "^0.12.1",
+    "@supabase/supabase-js": "^2.48.1",
     "@tailwindcss/cli": "^4.0.2",
     "@tailwindcss/vite": "^4.0.3",
     "cra-template": "1.2.0",
-    "firebase": "^11.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-helmet": "^6.1.0",
@@ -41,6 +40,7 @@
     ]
   },
   "devDependencies": {
-    "react-router-dom": "^7.1.5"
+    "react-router-dom": "^7.1.5",
+    "@babel/plugin-proposal-private-property-in-object" :"7.21.11"
   }
 }
