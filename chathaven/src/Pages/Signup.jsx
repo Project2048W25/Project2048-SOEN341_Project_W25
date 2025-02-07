@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import React, { useState } from "react";
 import frame3 from "../icons/frame-3.svg";
 import line1 from "../icons/line-1.svg";
 import line2 from "../icons/line-2.svg";
@@ -103,8 +102,6 @@ export const Signup = () => {
                                                 id="signup_password"
                                                 placeholder="Password"
                                                 type="password"
-                                                value={password}
-                                                onChange={handlePasswordChange}
                                                 required
                                             />
                                             <input
