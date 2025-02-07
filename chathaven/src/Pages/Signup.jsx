@@ -34,7 +34,7 @@ export const Signup = () => {
         } else {
           console.log("Signup successful:", data);
           // Redirect to dashboard
-          window.location.href = '/dashboard';
+          window.location.href = '/login';
         }
     };
     
@@ -46,7 +46,7 @@ export const Signup = () => {
           alert("Failed to sign up with Google!");
         } else {
           console.log("User signed up with Google:", data);
-          window.location.href = '/dashboard';
+          window.location.href = '/login';
         }
     };
     
