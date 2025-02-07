@@ -7,52 +7,55 @@ import line2 from "../icons/line-2.svg";
 import line3 from "../icons/line-3.svg";
 import google_icon from "../icons/devicon_google.svg";
 import "../styles/tailwind.CSS/Login.css";
-
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-
+import { signInWithEmail, signInWithGoogle } from "../services/authService";
+import { getProfileByUsername } from "../services/profileService";
 
 export const Login = () => {
     let login_password = "login_password";
     let login_username = "login_username";
-    let handleLoginSubmit = (event) => {
+
+    let handleLoginSubmit = async (event) => {
         event.preventDefault();
         const username = document.getElementById(login_username).value;
         const password = document.getElementById(login_password).value;
         console.log(`Username: ${username}, Password: ${password}`);
-        // add your login logic here
-        // to be implemented later
-    }
-    let handleLoginWithGoogle = (event) => {
-        // see documentation reference
-        // https://firebase.google.com/docs/reference/node/firebase.auth.GoogleAuthProvider
-        event.preventDefault(); // Prevent default form submission (if used in a form)
-        const firebaseConfig = {
-            apiKey: "AIzaSyCV9udwRxAw-6THpvISvqlBDjmRnhIrTl4",
-            authDomain: "project2048-38588.firebaseapp.com",
-            projectId: "project2048-38588",
-            storageBucket: "project2048-38588.firebasestorage.app",
-            messagingSenderId: "24011303667",
-            appId: "1:24011303667:web:f61673252279181abc2586",
-            measurementId: "G-VM2LFE8HMR"
-        };
+        
+        const { data:profileData, error:profileError } = await getProfileByUsername(username);
+        if (profileError || !profileData || profileData.length === 0) {
+            console.error("Error fetching profile or profile not found.");
+            alert("User does not exist or an error occurred.");
+            return;
+        }
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+        const profile = profileData[0];
+        // Compare the entered password with the stored password.
+        if (profile.password !== password) {
+            alert("Invalid password.");
+            return;
+        }
 
-        // Sign in with Google
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                console.log("User signed in:", result.user);
-                window.location.href = '/dashboard';
-            })
-            .catch((error) => {
-                console.error("Error signing in:", error);
-                window.alert("Failed to login with google!")
-            });
+        const email = profile.email;
+        const { data, error } = await signInWithEmail(email, password);
+        if (error) {
+            console.error("Error signing in:", error.message);
+            alert("Error signing in: " + error.message);
+            return;
+        }
+        console.log("Login successful:", profile);
+        // Redirect to dashboard upon successful login.
+        window.location.href = "/dashboard";
+    };
 
-
+    let handleLoginWithGoogle = async (event) => {
+        event.preventDefault();
+        const { data, error } = await signInWithGoogle();
+        if (error) {
+          console.error("Error signing in with Google:", error.message);
+          window.alert("Failed to login with Google!");
+        } else {
+          console.log("User signed in with Google:", data);
+          window.location.href = '/dashboard';
+        }
     };
 
     return (
@@ -135,9 +138,7 @@ export const Login = () => {
                                             </div>
 
                                             <div className="inline-flex flex-col items-center justify-center gap-3 relative flex-[0_0_auto]">
-                                                <div
-                                                    onClick={handleLoginSubmit}
-                                                    className="flex w-[400px] items-center justify-center gap-2.5 px-2.5 py-3.5 relative flex-[0_0_auto] rounded-xl [background:linear-gradient(180deg,rgb(97.75,141.78,255)_0%,rgb(134.57,64.08,205.06)_53.12%,rgb(87.5,3.9,116.88)_100%)]">
+                                                <div className="flex w-[400px] items-center justify-center gap-2.5 px-2.5 py-3.5 relative flex-[0_0_auto] rounded-xl [background:linear-gradient(180deg,rgb(97.75,141.78,255)_0%,rgb(134.57,64.08,205.06)_53.12%,rgb(87.5,3.9,116.88)_100%)]">
                                                     <button
                                                         type={"submit"}
                                                         onClick={handleLoginSubmit}

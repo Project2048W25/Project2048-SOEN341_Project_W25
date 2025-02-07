@@ -1,56 +1,61 @@
 import React, { useState } from "react";
+import React, { useState } from "react";
 import frame3 from "../icons/frame-3.svg";
 import line1 from "../icons/line-1.svg";
 import line2 from "../icons/line-2.svg";
 import line3 from "../icons/line-3.svg";
+// import slice1 from "../icons/slice-1.svg";
 import google_icon from "../icons/devicon_google.svg";
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-
+import { signInWithGoogle } from "../services/authService";
+import { signUpUser } from "../services/userService";
 
 export const Signup = () => {
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [passwordMatch, setPasswordMatch] = useState(true);
 
-    const handleSignUpWithGoogle = async (event) => {
+    const [userType, setUserType] = useState("Member");
+
+    const handleSignUpSubmit = async (event) => {
         event.preventDefault();
-        const firebaseConfig = {
-            apiKey: "AIzaSyCV9udwRxAw-6THpvISvqlBDjmRnhIrTl4",
-            authDomain: "project2048-38588.firebaseapp.com",
-            projectId: "project2048-38588",
-            storageBucket: "project2048-38588.firebasestorage.app",
-            messagingSenderId: "24011303667",
-            appId: "1:24011303667:web:f61673252279181abc2586",
-            measurementId: "G-VM2LFE8HMR"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-        try {
-            await signOut(auth);
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            console.log("User signed up:", user);
-        } catch (error) {
-            console.error("Error signing up:", error.message);
+        const username = document.getElementById("signup_username").value;
+        const email = document.getElementById("signup_email").value;
+        const password = document.getElementById("signup_password").value;
+        const confirmPassword = document.getElementById("signup_confirm_password").value;
+
+        if (password !== confirmPassword) {
+          alert("Passwords do not match!");
+          return;
+        }
+    
+        const { data, error } = await signUpUser(email, password, {
+            username,
+            role: userType,
+        });
+        if (error) {
+          console.error("Error signing up:", error.message);
+          alert(`Error signing up: ${error.message}`);
+        } else {
+          console.log("Signup successful:", data);
+          // Redirect to dashboard
+          window.location.href = '/dashboard';
         }
     };
-
-    const handlePasswordChange = (event) => {
-        setPassword(event.target.value);
-        setPasswordMatch(event.target.value === confirmPassword);
+    
+    const handleSignUpWithGoogle = async (event) => {
+        event.preventDefault();
+        const { data, error } = await signInWithGoogle();
+        if (error) {
+          console.error("Error signing up with Google:", error.message);
+          alert("Failed to sign up with Google!");
+        } else {
+          console.log("User signed up with Google:", data);
+          window.location.href = '/dashboard';
+        }
     };
-
-    const handleConfirmPasswordChange = (event) => {
-        setConfirmPassword(event.target.value);
-        setPasswordMatch(event.target.value === password);
-    };
-
+    
     return (
         <div className="bg-[#0e0e0e] flex flex-row justify-center w-full">
             <div className="bg-[#0e0e0e] overflow-hidden w-[1440px] h-[1024px]">
                 <div className="relative w-[1387px] h-[936px] top-[60px] left-[60px]">
+                    {/* Branding Section */}
                     <div className="absolute w-[751px] h-52 top-80 left-0">
                         <div className="absolute top-0 left-0 [font-family:'Noto_Sans-SemiBold',Helvetica] font-semibold text-white text-8xl tracking-[0] leading-[normal]">
                             ChatHaven
@@ -61,6 +66,7 @@ export const Signup = () => {
                             </div>
                         </div>
                     </div>
+                    {/* Right Section with Form and Decorative Elements */}
                     <div className="absolute w-[652px] h-[936px] top-0 left-[735px]">
                         <div className="absolute w-[302px] h-[302px] top-0 left-0 rounded-[151px] [background:linear-gradient(180deg,rgb(25.14,0,96.69)_0%,rgb(10.16,27.48,47.81)_100%)]" />
                         <div className="absolute w-[220px] h-[220px] top-[677px] left-[393px] rounded-[110px] rotate-[-28.50deg] [background:linear-gradient(180deg,rgb(0,15.47,96.69)_0%,rgb(10.16,22.96,47.81)_100%)]" />
@@ -76,21 +82,25 @@ export const Signup = () => {
                                                 Just some details to get you in.!
                                             </p>
                                         </div>
+
                                         <div className="inline-flex flex-col items-start gap-[25px] relative flex-[0_0_auto]">
                                             <input
                                                 className="w-[400px] px-4 py-3.5 relative rounded-xl border border-solid border-white [background:none] mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-white text-xl tracking-[0] leading-[normal]"
+                                                id="signup_username"
                                                 placeholder="Username"
                                                 type="text"
                                                 required
                                             />
                                             <input
                                                 className="w-[400px] px-4 py-3.5 relative rounded-xl border border-solid border-white [background:none] mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-white text-xl tracking-[0] leading-[normal]"
+                                                id="signup_email"
                                                 placeholder="Email"
                                                 type="email"
                                                 required
                                             />
                                             <input
                                                 className="w-[400px] px-4 py-3.5 relative rounded-xl border border-solid border-white [background:none] mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-white text-xl tracking-[0] leading-[normal]"
+                                                id="signup_password"
                                                 placeholder="Password"
                                                 type="password"
                                                 value={password}
@@ -99,32 +109,51 @@ export const Signup = () => {
                                             />
                                             <input
                                                 className="w-[400px] px-4 py-3.5 relative rounded-xl border border-solid border-white [background:none] mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-white text-xl tracking-[0] leading-[normal]"
+                                                id="signup_confirm_password"
                                                 placeholder="Confirm Password"
                                                 type="password"
-                                                value={confirmPassword}
-                                                onChange={handleConfirmPasswordChange}
-                                                required
+                                                required={true}
                                             />
-                                            {!passwordMatch && (
-                                                <div className="text-red-250 [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-base tracking-[0] leading-[normal]">
-                                                    Passwords do not match
-                                                </div>
-                                            )}
+
+                                            {/* User Type Selection */}
                                             <div>
-                                                <div className="flex w-[200px] items-start justify-center gap-2.5 px-4 py-3.5 relative bg-[#2836d7] rounded-xl border border-solid border-black">
+                                                <div
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    onClick={() => setUserType("Member")}
+                                                    className={`flex w-[200px] items-start justify-center gap-2.5 px-4 py-3.5 relative ${
+                                                        userType === "Member"
+                                                            ? "bg-[#2836d7] rounded-xl border border-solid border-black"
+                                                            : "border border-solid border-white"
+                                                    }`}        
+                                                >
                                                     <div className="relative w-fit mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-[#fffefe] text-xl tracking-[0] leading-[normal]">
                                                         Member
                                                     </div>
                                                 </div>
-                                                <div className="flex w-[200px] items-start justify-center gap-2.5 px-4 py-3.5 relative rounded-xl border border-solid border-white">
+                                                <div
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    onClick={() => setUserType("Admin")}
+                                                    className={`flex w-[200px] items-start justify-center gap-2.5 px-4 py-3.5 relative ${
+                                                        userType === "Admin"
+                                                        ? "bg-[#2836d7] border border-solid border-black"
+                                                        : "border border-solid border-white"
+                                                    }`}
+                                                    >
                                                     <div className="relative w-fit mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-white text-xl tracking-[0] leading-[normal]">
                                                         Admin
                                                     </div>
                                                 </div>
                                             </div>
+
+
                                             <div className="inline-flex flex-col items-center justify-center gap-3 relative flex-[0_0_auto]">
                                                 <div className="flex w-[400px] items-center justify-center gap-2.5 px-2.5 py-3.5 rounded-xl [background:linear-gradient(180deg,rgb(45.62,76.4,238)_0%,rgb(33.5,30.28,191.25)_53.12%,rgb(3.9,15.19,116.88)_100%)] relative flex-[0_0_auto]">
-                                                    <button className="text-xl relative w-full h-full mt-[-1.00px] [font-family:'Noto_Sans-SemiBold',Helvetica] font-semibold text-white tracking-[0] leading-[normal]">
+                                                    <button
+                                                        onClick={handleSignUpSubmit}
+                                                        className="text-xl relative w-full h-full mt-[-1.00px] [font-family:'Noto_Sans-SemiBold',Helvetica] font-semibold text-white tracking-[0] leading-[normal]"
+                                                    >
                                                         Signup
                                                     </button>
                                                 </div>
@@ -141,6 +170,8 @@ export const Signup = () => {
                                         </div>
                                         <img
                                             onClick={handleSignUpWithGoogle}
+                                            role="button"
+                                            tabIndex={0}
                                             className="relative flex-[0_0_auto] hover:scale-105"
                                             alt="Sign up with Google"
                                             src={google_icon}
