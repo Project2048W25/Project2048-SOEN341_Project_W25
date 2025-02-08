@@ -17,6 +17,9 @@
 .env.development.local
 .env.test.local
 .env.production.local
+/.idea
+/.anima
+/.vscode
 
 npm-debug.log*
 yarn-debug.log*

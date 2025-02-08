@@ -3,7 +3,7 @@ import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import './App.css';
 import { Login } from "./Pages/Login";
 import { Signup } from "./Pages/Signup";
-import { Forgot } from "./Pages/Forgot";
+import { ForgotPassword } from "./Pages/ForgotPassword";
 import { AdminView } from "./Pages/AdminView";
 import { AppChat } from "./Pages/App";
 import { MemberView } from "./Pages/MemberView";
@@ -25,7 +25,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot" element={<Forgot />} />
+          <Route path="/forgot" element={<ForgotPassword />} />
           <Route path="/app" element={<AppChat />} />
         </Routes>
       </BrowserRouter>
