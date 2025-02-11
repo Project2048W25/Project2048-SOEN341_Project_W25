@@ -6,7 +6,8 @@ import line1 from "../icons/line-1.svg";
 import line2 from "../icons/line-2.svg";
 import line3 from "../icons/line-3.svg";
 import google_icon from "../icons/devicon_google.svg";
-import "../styles/tailwind.CSS/Login.css";
+// import "../styles/tailwind.CSS/Login.css";
+import "../styles/tailwind.CSS/tailwind.css";
 import { signInWithEmail, signInWithGoogle } from "../services/authService";
 import { getProfileByUsername } from "../services/profileService";
 
@@ -111,7 +112,7 @@ export const Login = () => {
                                             >
                                             </input>
                                             <img
-                                                className="relative w-[18px] h-[18px] float-right align-middle"
+                                                className="relative w-[25px] h-[25px]  float-right align-middle mt-3.5"
                                                 alt="Closed eye"
                                                 src={closedEye}
                                                 onClick={() => {

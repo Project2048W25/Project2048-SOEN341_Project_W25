@@ -7,7 +7,6 @@ import line3 from "../icons/line-3.svg";
 import google_icon from "../icons/devicon_google.svg";
 import { signInWithGoogle } from "../services/authService";
 import { signUpUser } from "../services/userService";
-import "../styles/tailwind.CSS/Signup.css";
 
 export const Signup = () => {
 
@@ -61,9 +60,9 @@ export const Signup = () => {
                             ChatHaven
                         </div>
                         <div className="inline-flex items-start gap-2.5 px-6 py-3.5 absolute top-32 left-[9px] border-4 border-solid border-white">
-                            <div className="relative w-fit [font-family:'Noto_Sans-DisplaySemiBold_Italic',Helvetica] font-semibold italic text-white text-[32px] tracking-[0] leading-[normal]">
-                                Skip the lag ?
-                            </div>
+                            <p className="relative w-fit [font-family:'Noto_Sans-DisplaySemiBold_Italic',Helvetica] font-semibold italic text-white text-[32px] tracking-[0] leading-[normal]">
+                                 Welcome!
+                            </p>
                         </div>
                     </div>
                     {/* Right Section with Form and Decorative Elements */}
@@ -79,7 +78,7 @@ export const Signup = () => {
                                                 Signup
                                             </div>
                                             <p className="relative w-fit [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-white text-base tracking-[0] leading-[normal]">
-                                                Just some details to get you in.!
+                                                Create your account in seconds!
                                             </p>
                                         </div>
 
@@ -91,6 +90,7 @@ export const Signup = () => {
                                                 type="text"
                                                 required
                                             />
+
                                             <input
                                                 className="w-[400px] px-4 py-3.5 relative rounded-xl border border-solid border-white [background:none] mt-[-1.00px] [font-family:'Noto_Sans-Regular',Helvetica] font-normal text-white text-xl tracking-[0] leading-[normal]"
                                                 id="signup_email"

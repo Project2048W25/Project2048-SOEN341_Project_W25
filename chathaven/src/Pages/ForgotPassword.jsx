@@ -5,7 +5,7 @@ import {signup} from '../Pages/Signup'
 import line3 from "../icons/line-3.svg";
 import slice1 from "../icons/slice-1.svg";
 import '../styles/tailwind.CSS/tailwind.css'
-import '../styles/tailwind.CSS/Login.css'
+// import '../styles/tailwind.CSS/Login.css'
 
 export const ForgotPassword = () => {
   return (
