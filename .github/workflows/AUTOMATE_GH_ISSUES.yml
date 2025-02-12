@@ -23,6 +23,7 @@ jobs:
           echo "sprint=sprint-4" >> $GITHUB_ENV
         else
           echo "sprint=sprint-1" >> $GITHUB_ENV
+        fi
 
     - name: Label new issue
       uses: actions-ecosystem/action-add-labels@v1
