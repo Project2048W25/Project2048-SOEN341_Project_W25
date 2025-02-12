@@ -1,42 +1,39 @@
 name: Automate Issue Labeling and Project Management
 
 on:
-    issues:
-        types: [opened]
+  issues:
+    types: [opened]
 
 jobs:
-    label_issue:
-        runs-on: ubuntu-latest
+  label_issue:
+    runs-on: ubuntu-latest
 
-        steps:
-        - name: Get current date
-          id: date
-          run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+    steps:
+    - name: Get current date
+      run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-        - name: Determine sprint label
-          id: sprint
-          run: |
-            current_date=$(date +'%Y-%m-%d')
-            if [[ "$current_date" > "2025-02-07" && "$current_date" < "2025-03-07" ]]; then
-              echo "::set-output name=sprint::sprint-2"
-            elif [[ "$current_date" > "2025-03-07" && "$current_date" < "2025-03-21" ]]; then
-              echo "::set-output name=sprint::sprint-3"
-            elif [[ "$current_date" > "2025-03-21" && "$current_date" < "2025-04-11" ]]; then
-              echo "::set-output name=sprint::sprint-4"
-            else
-              echo "::set-output name=sprint::sprint-1"
-            fi
+    - name: Determine sprint label
+      run: |
+        current_date=$(date +'%Y-%m-%d')
+        if [[ "$current_date" > "2025-02-07" && "$current_date" < "2025-03-07" ]]; then
+          echo "sprint=sprint-2" >> $GITHUB_ENV
+        elif [[ "$current_date" > "2025-03-07" && "$current_date" < "2025-03-21" ]]; then
+          echo "sprint=sprint-3" >> $GITHUB_ENV
+        elif [[ "$current_date" > "2025-03-21" && "$current_date" < "2025-04-11" ]]; then
+          echo "sprint=sprint-4" >> $GITHUB_ENV
+        else
+          echo "sprint=sprint-1" >> $GITHUB_ENV
 
-        - name: Label new issue
-          uses: actions-ecosystem/action-add-labels@v1
-          with:
-              github_token: ${{ secrets.GITHUB_TOKEN }}
-              labels: ${{ steps.sprint.outputs.sprint }}
+    - name: Label new issue
+      uses: actions-ecosystem/action-add-labels@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        labels: ${{ env.sprint }}
 
-        - name: Move issue to project
-          uses: alex-page/github-project-automation-plus@v0.3.0
-          with:
-              project: 'Project2048 - ChatHaven'
-              column: 'Tasks To Do'
-              repo-token: ${{ secrets.GITHUB_TOKEN }}
-              github_token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Move issue to project
+      uses: alex-page/github-project-automation-plus@v0.3.0
+      with:
+        project: 'Project2048 - ChatHaven'
+        column: 'Tasks To Do'
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
