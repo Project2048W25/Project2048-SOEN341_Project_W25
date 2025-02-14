@@ -1,113 +1,289 @@
-/* Global Styles */
+/* =========================================
+   Global & Body
+   ========================================= */
 body, html {
-    margin: 0;
-    padding: 0;
-    background-color: #1a1333; /* Dark purple */
-    color: #ffffff;
-    font-family: 'Inter', sans-serif;
-    height: 100vh;
-    width: 100vw;
-    display: flex;
+  margin: 0;
+  padding: 0;
+  background-color: #1a1333; /* Dark purple */
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  box-sizing: border-box;
 }
 
-/* Sidebar (Fixed on Left) */
+/* =========================================
+   Sidebar - Optimized for Layout & Spacing
+   ========================================= */
 .sidebar {
-    width: 18vw; /* Relative width */
-    min-width: 220px; /* Minimum width */
-    max-width: 280px; /* Prevents being too wide */
-    height: 100vh;
-    background-color: #2a1d56;
-    display: flex;
-    flex-direction: column;
-    padding: 2vh 1vw;
-    border-right: 2px solid #3c2565;
-    position: fixed;
-    left: 0;
-    top: 0;
+  width: 17vw; /* Slightly adjusted for balance */
+  min-width: 220px;
+  max-width: 280px;
+  height: 100vh;
+  background-color: #2a1d56;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5vh 1vw; /* Slightly reduced padding to prevent overflow */
+  border-right: 2px solid #3c2565;
+  position: fixed;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
 }
 
-/* Sidebar Content */
+/* Sidebar Title */
 .sidebar .title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
-.sidebar .section {
-    margin-top: 1vh;
-    font-size: 0.9rem;
-    font-weight: 500;
+/* Sections in Sidebar */
+.section {
+  display: flex;
+  flex-direction: column; /* Ensures proper stacking */
+  align-items: flex-start;
+  margin-bottom: 1rem;
 }
 
-.sidebar button {
-    width: 100%;
-    background-color: #3c2565;
+/* Teams Label - Makes sure it stays separate */
+.section span {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+/* Create Team Button */
+.create-team-btn {
+  width: 100%;
+  background-color: #4b2f7d;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 5px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-top: 0.4rem; /* Ensures spacing below "Teams" title */
+}
+
+.create-team-btn:hover {
+  background-color: #5b3f8f;
+}
+
+/* Team List */
+.team-item {
+  list-style: none;
+  margin-bottom: 3px; /* Reduced spacing */
+}
+
+/* Team Button */
+.team-button {
+  width: 200px;
+  background-color: #3c2565;
+  color: white;
+  border: none;
+  padding: 0.7rem; /* Slightly reduced padding */
+  margin-top: 0.3rem;
+  border-radius: 5px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.team-button:hover {
+  background-color: #4b2f7d;
+}
+
+/* =========================================
+   Add User Button - Optimized Size
+   ========================================= */
+.add-user-btn {
+  width: 30px; /* Forces a small compact width */
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #4b2f7d;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.8rem;
+  transition: background-color 0.2s ease;
+  margin-left: 0.3rem;
+}
+
+.add-user-btn:hover {
+  background-color: #5b3f8f;
+}
+
+/* =========================================
+   Channels Sidebar
+   ========================================= */
+.channels-sidebar {
+  margin-top: 1.5vh;
+  background-color: #3c2565;
+  padding: 1vh 1vw;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* Channels Header */
+.channels-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 0.6rem;
+}
+
+.channels-header h3 {
+  font-size: 1rem;
+  margin: 0 0 0.3rem 0;
+  font-weight: 600;
+}
+
+/* Channels List */
+.channels-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.channel-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+/* ADD CHANNEL BUTTON */
+.add-channel-btn {
+    width: 100%; /* Makes it fit the width of the sidebar */
+    background-color: #4b2f7d;
     color: white;
     border: none;
-    padding: 1vh 1vw;
-    margin-top: 0.5rem;
+    padding: 0.5rem;
     border-radius: 5px;
-    text-align: left;
+    text-align: center;
     cursor: pointer;
-    font-size: 0.9rem;
-}
+    font-size: 0.85rem;
+    margin-top: 0.4rem; /* Provides spacing from the channel title */
+  }
+  
+  .add-channel-btn:hover {
+    background-color: #5b3f8f;
+  }
+  
 
-.sidebar button:hover {
-    background-color: #4b2f7d;
-}
-
-/* Main Content (Full Width) */
+/* =========================================
+   Main Content Area
+   ========================================= */
 .main-container {
-    flex: 1;
-    margin-left: 20vw; /* Pushes content to the right */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    height: 100vh;
+  flex: 1;
+  margin-left: 18vw; /* Adjusted to match sidebar width */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100vh;
+  box-sizing: border-box;
 }
 
-/* Admin & Member View */
 .view-container {
-    text-align: center;
-    width: 80%;
-    max-width: 400px;
+  text-align: center;
+  width: 80%;
+  max-width: 500px;
 }
 
+/* Headings & Paragraphs */
 .view-container h1 {
-    font-size: 1.8rem;
-    font-weight: bold;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }
 
 .view-container p {
-    margin-top: 1vh;
-    font-size: 1rem;
+  margin-top: 1vh;
+  font-size: 1rem;
 }
 
+/* Buttons */
 .view-container button {
-    margin-top: 2vh;
-    padding: 1vh 2vw;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-    border: none;
+  margin-top: 2vh;
+  padding: 1vh 2vw;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
 }
 
-.admin-button {
-    background-color: #4a69bd;
-    color: white;
+/* =========================================
+   Modal Styling
+   ========================================= */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #2a1d56;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #3c2565;
+  z-index: 9999;
+  max-width: 300px;
+  width: 80%;
+  box-sizing: border-box;
 }
 
-.admin-button:hover {
-    background-color: #5d78d1;
+.modal h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
-.member-button {
-    background-color: #1abc9c;
-    color: white;
+.modal-input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
-.member-button:hover {
-    background-color: #16a085;
+.modal-button {
+  background-color: #4b2f7d;
+  border: none;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  margin-right: 0.5rem;
+}
+
+.modal-button:hover {
+  background-color: #5b3f8f;
+}
+
+.modal-close {
+  background-color: #555;
+  border: none;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.modal-close:hover {
+  background-color: #666;
 }
