@@ -1,10 +1,11 @@
+@import "tailwindcss"; /* 🌟 Import Tailwind CSS */
+
 /* 🌟 General Styles */
 body, html {
   height: 100%;
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(180deg, #121212 0%, #0b0b0b 50%, #050505 100%);
-  background-attachment: fixed;
+  margin: 5px;
+  padding: 5px;
+  background: linear-gradient(180deg, #121212 0%, #0b0b0b 50%, #050505 100%) fixed;
   background-size: cover;
   color: white;
   font-family: 'Noto Sans', sans-serif;
@@ -123,3 +124,4 @@ button:hover {
   transform: scale(1.05);
   opacity: 0.9;
 }
+

@@ -1,6 +1,4 @@
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
@@ -38,6 +36,38 @@ If you aren't satisfied with the build tool and configuration choices, you can `
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+
+## Custom Project Scripts
+
+### `npm run tree-print`
+prints the tree of the project in the console
+```
+npx tree-cli --ignore node_modules --ignore build -l 999
+```
+**ref**: https://www.npmjs.com/package/tree-cli 
+
+### `npm run storybook`
+
+Runs the storybook server
+```
+npx start-storybook -p 6006
+``` 
+ref: https://storybook.js.org/docs/react/get-started/start-storybook
+
+### `npm run tailwindcss-build-watch`
+Compiles the tailwindcss styles and watches for changes
+```
+npx @tailwindcss/cli -i ./src/index.css -o ./src/styles/tailwind.CSS/tailwind.css --watch
+```
+Tailwind v4.xxx ref: https://tailwindcss.com/docs/installation 
+
+### `npm run prod`
+Runs the app in production mode on localhost 
+```
+npm run build && serve -s build
+```
+ref: https://www.npmjs.com/package/serve
+___ 
 
 ## Learn More
 

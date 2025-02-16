@@ -2,7 +2,8 @@
 body, html {
     margin: 0;
     padding: 0;
-    background-color: #1a1333; /* Dark purple */
+    /*background-color: #1a1333; !* Dark purple *!*/
+    background-color: transparent; /* Dark purple */
     color: #ffffff;
     font-family: 'Inter', sans-serif;
     height: 100vh;
