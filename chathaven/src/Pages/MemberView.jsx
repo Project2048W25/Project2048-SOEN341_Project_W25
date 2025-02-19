@@ -1,13 +1,14 @@
 import "./index.css";
+import MemberDM from "./MemberDM";
 
 export const MemberView = () => {
   return (
     <div className="main-container">
       <div className="view-container">
         <h1>Welcome to ChatHaven.</h1>
-        <p>Add friends and join teams.</p>
-        <button className="member-button">+ Add Friends</button>
+        <p>You are a member. Enjoy chatting in your teams and channels!</p>
       </div>
+      <MemberDM />
     </div>
   );
 };
