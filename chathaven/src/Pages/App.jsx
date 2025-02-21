@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { Sidebar } from "./Sidebar";
+// import { Sidebar } from "../components/SideBar";
 import { AdminView } from "./AdminView";
 import { MemberView } from "./MemberView";
 import "./index.css";
@@ -43,7 +44,7 @@ export const AppChat = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <main className="main-container">
+      <main className="flex-1">
         {role === "Admin" ? <AdminView /> : <MemberView />}
       </main>
     </div>
