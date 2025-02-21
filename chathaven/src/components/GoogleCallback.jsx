@@ -62,7 +62,7 @@ const GoogleCallback = () => {
 
         // 3. Redirect the user to your main app or dashboard
         setStatus('Redirecting to the app...')
-        navigate('/MemberView') // or wherever you want
+        navigate('/app') // or wherever you want
       } catch (err) {
         console.error('Unexpected error:', err)
         setStatus('Something went wrong.')
