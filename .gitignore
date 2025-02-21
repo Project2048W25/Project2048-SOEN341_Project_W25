@@ -1,1 +1,4 @@
 .idea/
+/private-bertin/
+.anima/
+.DS_Store

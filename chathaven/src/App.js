@@ -7,7 +7,7 @@ import { ForgotPassword } from "./Pages/ForgotPassword";
 import { AdminView } from "./Pages/AdminView";
 import { AppChat } from "./Pages/App";
 import { MemberView } from "./Pages/MemberView";
-import { Sidebar } from "./Pages/Sidebar";
+import { TeamAdminView } from "./Pages/TeamAdminView";
 
 function App() {
   return (
@@ -16,7 +16,7 @@ function App() {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{'ChatHaven'}</title>
-        <link rel="stylesheet" href="styles.css" />
+        <link rel="stylesheet" href="styles/tailwind.CSS/tailwind.css" />
         <link rel="icon" type="image/x-icon" href={logo} />
       </head>
 
@@ -27,6 +27,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot" element={<ForgotPassword />} />
           <Route path="/app" element={<AppChat />} />
+          <Route path="/admin" element={<TeamAdminView  />} />
         </Routes>
       </BrowserRouter>
     </>
