@@ -39,14 +39,12 @@ export const Signup = () => {
     };
     
     const handleSignUpWithGoogle = async (event) => {
-        event.preventDefault();
         const { data, error } = await signInWithGoogle();
         if (error) {
           console.error("Error signing up with Google:", error.message);
           alert("Failed to sign up with Google!");
         } else {
           console.log("User signed up with Google:", data);
-          window.location.href = '/login';
         }
     };
     
