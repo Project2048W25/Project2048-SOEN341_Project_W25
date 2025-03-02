@@ -22,6 +22,12 @@ export async function signUpWithEmail(email, password, additionalData = {}) {
 export async function signInWithGoogle() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/google-callback`,
+      queryParams: {
+        prompt: 'select_account'
+      }
+    }
   });
   return { data, error };
 }
