@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
 import "./index.css";
 
@@ -188,6 +189,49 @@ export const Sidebar = () => {
       console.error("Error declining friend request:", err);
     }
   };
+
+
+  // const [user, setUser] = useState(null);
+  // const [friends, setFriends] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserAndFriends = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      setUser(user);
+
+      const { data: friendsData } = await supabase
+        .from("friends")
+        .select(`
+          id,
+          sender_id,
+          receiver_id,
+          sender:sender_id ( id, username ),
+          receiver:receiver_id ( id, username )
+        `)
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .eq("status", "accepted");
+
+      setFriends(friendsData || []);
+    };
+
+    fetchUserAndFriends();
+  }, []);
+
+  // const handleUserClick = (friend) => {
+  //   const friendProfile = friend.sender_id === user.id ? friend.receiver : friend.sender;
+  //   navigate(`/dm/${friendProfile.username}`);
+  // };
+
+
+    // Handle clicking a friend's username -> Navigate to DM page
+    const handleUserClick = (friend) => {
+      const isSender = friend.sender_id === user?.id;
+      const friendProfile = isSender ? friend.receiver : friend.sender;
+      navigate(`/dm/${friendProfile.username}`); //this navigates to MemberDM
+    };
+  
 
   // Teams Subscription
   useEffect(() => {
@@ -392,7 +436,7 @@ export const Sidebar = () => {
             const isSender = f.sender_id === user?.id;
             const friendProfile = isSender ? f.receiver : f.sender;
             return (
-              <li key={f.id} className="friend-item">
+              <li key={f.id} className="friend-item" onClick={() => handleUserClick(f)} style={{ cursor: "pointer" }}>
                 <span>{friendProfile?.username}</span>
               </li>
             );
