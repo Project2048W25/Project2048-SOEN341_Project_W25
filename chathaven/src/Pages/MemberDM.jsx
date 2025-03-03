@@ -3,13 +3,15 @@ import { useParams } from "react-router-dom";
 import "./index.css";
 
 export const MemberDM = () => {
-  const { username } = useParams(); // Get the selected friend's username
+  const { username } = useParams(); // Friend's username from the URL
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
+  // Handle sending message: adds message to local state
   const handleSend = () => {
     if (input.trim()) {
-      setMessages([...messages, { text: input, isOutgoing: true }]);
+      // For outgoing messages, label as "You"
+      setMessages([...messages, { sender: "You", text: input, isOutgoing: true }]);
       setInput("");
     }
   };
@@ -19,41 +21,35 @@ export const MemberDM = () => {
       event.preventDefault();
       handleSend();
     }
-  }
+  };
 
   return (
     <div className="main-container">
-      {/* Header */}
+      {/* DM Header */}
       <div className="dm-header">
-        <div className="avatar"></div>
         <span className="username">{username}</span>
       </div>
-      
+
       {/* Chat Messages */}
       <div className="chat-messages">
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.isOutgoing ? "outgoing" : "incoming"}`}>
             <div className="message__outer">
-            {!msg.isOutgoing && <div className="message__avatar"></div>}
-              {/* <div className="message__avatar"></div> */}
-              <div className="message__inner">
-                <div className="message__bubble">{msg.text}</div>
-                <div className="message__actions"></div>
-                <div className="message__spacer"></div>
+              <div className="message__bubble">
+                <strong>{msg.isOutgoing ? "You" : username}:</strong> {msg.text}
               </div>
-              {/* {msg.isOutgoing && <div className="message__status"></div>} */}
             </div>
           </div>
         ))}
       </div>
-      
+
       {/* Message Input */}
       <div className="chat-input-container">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown} //Detects if the user presses the Enter key
+          onKeyDown={handleKeyDown}
           placeholder="Write message"
           className="chat-input"
         />

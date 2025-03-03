@@ -1,457 +1,361 @@
-/* =========================================
-   Global & Body
-   ========================================= */
-   body, html {
-    margin: 0;
-    padding: 0;
-    background-color: #1a1333; /* Dark purple */
-    color: #ffffff;
-    font-family: 'Inter', sans-serif;
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    box-sizing: border-box;
-  }
-  
-  /* =========================================
-     Sidebar - Layout & Spacing
-     ========================================= */
-  .sidebar {
-    width: 17vw; /* Slightly adjusted for balance */
-    min-width: 220px;
-    max-width: 280px;
-    height: 100vh;
-    background-color: #2a1d56;
-    display: flex;
-    flex-direction: column;
-    padding: 1.5vh 1vw; /* Reduced padding */
-    border-right: 2px solid #3c2565;
-    position: fixed;
-    left: 0;
-    top: 0;
-    box-sizing: border-box;
-  }
-  
-  /* Sidebar Title */
-  .sidebar .title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  
-  /* =========================================
-     Sections in Sidebar
-     ========================================= */
-  .section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-  }
-  
-  .section span {
-    font-size: 0.9rem;
-    font-weight: bold;
-    margin-bottom: 0.4rem;
-    display: block;
-  }
-  
-  /* =========================================
-     Add User Button (for invites/friend requests)
-     ========================================= */
-  .add-user-btn {
-    width: 30px;
-    height: 30px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #4b2f7d;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    color: #fff;
-    font-size: 0.8rem;
-    transition: background-color 0.2s ease;
-    margin-left: 0.3rem;
-  }
-  
-  .add-user-btn:hover {
-    background-color: #5b3f8f;
-  }
-  
-  /* =========================================
-     Friends List & Pending Requests
-     ========================================= */
-  .friend-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 4px 0;
-    font-size: 0.9rem;
-    padding: 0.5rem;
-    background-color: #3c2565;
-    border-radius: 5px;
-    color: white;
-  }
-  
-  .friend-item span {
-    flex-grow: 1;
-  }
-  
-  .accept-btn, .decline-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-left: 5px;
-  }
-  
-  .accept-btn:hover {
-    color: green;
-  }
-  
-  .decline-btn:hover {
-    color: red;
-  }
-  
-  /* =========================================
-     Teams
-     ========================================= */
-  .team-item {
-    list-style: none;
-    margin-bottom: 3px;
-  }
-  
-  .team-button {
-    width: 200px;
-    background-color: #3c2565;
-    color: white;
-    border: none;
-    padding: 0.7rem;
-    margin-top: 0.3rem;
-    border-radius: 5px;
-    text-align: left;
-    cursor: pointer;
-    font-size: 0.9rem;
-  }
-  
-  .team-button:hover {
-    background-color: #4b2f7d;
-  }
-  
-  /* =========================================
-     Channels
-     ========================================= */
-  .channels-sidebar {
-    margin-top: 1.5vh;
-    background-color: #3c2565;
-    padding: 1vh 1vw;
-    border-radius: 5px;
-    box-sizing: border-box;
-  }
-  
-  .channels-header {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 0.6rem;
-  }
-  
-  .channels-header h3 {
-    font-size: 1rem;
-    margin: 0 0 0.3rem 0;
-    font-weight: 600;
-  }
-  
-  .channels-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    margin-top: 0.5rem;
-  }
-  
-  .channel-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 4px 0;
-    font-size: 0.9rem;
-  }
-  
-  /* Add Channel Button */
-  .add-channel-btn {
-    width: 100%;
-    background-color: #4b2f7d;
-    color: white;
-    border: none;
-    padding: 0.5rem;
-    border-radius: 5px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 0.85rem;
-    margin-top: 0.4rem;
-  }
-  
-  .add-channel-btn:hover {
-    background-color: #5b3f8f;
-  }
-  
-  /* =========================================
-     Main Content Area (Push to Right)
-     ========================================= */
-  .main-container {
-    width: 84vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    margin-left: 17vw;
-    justify-content: space-between;
-    align-items: center;
-    /* text-align: center; */
-    background-color: #1a1333;
-    box-sizing: border-box;
-    padding:0;
-    overflow:hidden;
-    /* margin:0 auto; */
-  }
-
-  .flex-grow{
-    flex-grow: 1;
-    /* overflow-y: auto; */
-    /* width: 100%; */
-    padding: 10px;
-  }
-  
-  .view-container {
-    text-align: center;
-    width: 80%;
-    max-width: 500px;
-  }
-  
-  .view-container h1 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-  }
-  
-  .view-container p {
-    margin-top: 1vh;
-    font-size: 1rem;
-  }
-  
-  .view-container button {
-    margin-top: 2vh;
-    padding: 1vh 2vw;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-    border: none;
-  }
-  
-  /* =========================================
-     Modal Styling
-     ========================================= */
-  .modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #2a1d56;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 2px solid #3c2565;
-    z-index: 9999;
-    max-width: 300px;
-    width: 80%;
-    box-sizing: border-box;
-  }
-  
-  .modal h4 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-  
-  .modal-input {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: none;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  .modal-button {
-    background-color: #4b2f7d;
-    border: none;
-    padding: 0.6rem 1rem;
-    cursor: pointer;
-    color: #fff;
-    font-size: 0.9rem;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-    margin-right: 0.5rem;
-  }
-  
-  .modal-button:hover {
-    background-color: #5b3f8f;
-  }
-  
-  .modal-close {
-    background-color: #555;
-    border: none;
-    padding: 0.6rem 1rem;
-    cursor: pointer;
-    color: #fff;
-    font-size: 0.9rem;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-  }
-  
-  .modal-close:hover {
-    background-color: #666;
-  }
-  
-    /* =========================================
-     Direct Messaging (DM)
-     ========================================= */
-.dm-header{
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin-right: 10px;
-  padding: 15px;
-  background-color: #3c2565;
-  color: white;
-  border-bottom: 2px solid #4b2f7d;
+/* Global Styles */
+* {
+  box-sizing: border-box;
 }
 
-/* =========================================
-   Chat Message Styling
-   ========================================= */
-   .chat-messages {
-    flex-grow: 1;
-    padding: 20px;
-    width:100%;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    gap: 10px;
-    background-color: #1a1333;
-  }
-  
-  /* Individual Message */
-  .message {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  /* Outer wrapper */
-  .message__outer {
-    display: flex;
-    align-items: flex-start;
-    width: 100%;
-    max-width: 70%; 
-  }
-  
-  /* Avatar */
-  .message__avatar {
-    width: 40px;
-    height: 40px;
-    background-color: gray;
-    border-radius: 50%;
-    /* margin-right: 10px; */
-  }
-  
-  /* Inner message container */
-  .message__inner {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-  }
-  
-  /* Message bubble */
-  .message__bubble {
-    max-width: 400px;
-    border-radius: 10px;
-    word-wrap: break-word;
-    font-size:14px;
-    padding: 10px;
-  }
-  .outgoing{
-    display: flex;
-    justify-content: flex-end
-  }
-  
-  /* Sent messages */
-  .outgoing .message__bubble {
-    background-color: #007aff;
-    color: white;
-    align-self: flex-end;
-    margin-left:auto;
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #1f1c2c; /* Deep midnight purple for dashboard */
+  color: #dcddde;
+  height: 100vh;
+  width: 100vw;
+}
 
-  .incoming{
-    display: flex;
-    justify-content: flex-start;
-  }
-  
-  /* Received messages */
-  .incoming .message__bubble {
-    background-color: #3c2565;
-    color: white;
-    align-self: flex-start;
-    margin-right:auto
-  }
-  
-  /* Message actions (like time, seen, reactions) */
-  .message__actions {
-    width: 67px;
-    padding-right:5px;
-  }
-  
-  /* Spacer */
-  .message__spacer {
-    flex:1;
-    height:5px;
-  }
-  
-  /* =========================================
-     Chat Input
-     ========================================= */
-  .chat-input-container {
-    width:100%;
-    display: flex;
-    padding: 15px;
-    border-top: 2px solid #3c2565;
-    background-color: #2a1d56;
-    /* position: fixed; */
-  }
-  
-  .chat-input {
-    flex-grow: 1;
-    padding: 10px;
-    border-radius: 6px;
-    border: none;
-    background-color: #3c2565;
-    color: white;
-    outline: none;
-  }
-  
-  .send-button {
-    margin-left: 10px;
-    padding: 10px 15px;
-    border-radius: 6px;
-    background-color: #4b2f7d;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .send-button:hover {
-    background-color: #5b3f8f;
-  }
-  
+/* App Layout */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Sidebar Styling */
+.sidebar {
+  width: 280px;
+  background-color: #2a2433; /* Updated dark purple/midnight tone */
+  color: #dcddde;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-right: 1px solid #1f1a25;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh; /* Ensure the sidebar always reaches the bottom */
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Profile Showcase at Top */
+.sidebar-profile {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #202225;
+}
+.sidebar-profile .username {
+  font-size: 18px;
+  font-weight: bold;
+}
+.sidebar-profile .role {
+  font-size: 14px;
+  color: #72767d;
+}
+
+/* Section Titles */
+.sidebar-section-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #5e759c;
+  text-transform: uppercase;
+  margin-top: 15px;
+  margin-bottom: 8px;
+}
+
+/* Lists */
+.dm-list,
+.team-list,
+.channel-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dm-item,
+.team-item,
+.channel-item {
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  transition: background-color 0.2s;
+}
+.dm-item:hover,
+.team-item:hover,
+.channel-item:hover {
+  background-color: #393c43;
+}
+.dm-item.active,
+.team-item.active,
+.channel-item.active {
+  background-color: #5865f2;
+}
+
+/* Buttons in Sidebar */
+.sidebar button {
+  background: none;
+  border: none;
+  color: #dcddde;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+.sidebar button:hover {
+  background-color: #393c43;
+}
+
+/* Specific Action Buttons */
+.add-friend-btn,
+.create-team-btn,
+.create-channel-btn {
+  background-color: #7B61FF !important;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  color: #fff !important;
+  width: 100%;
+  margin-top: 10px;
+  transition: background-color 0.2s !important;
+}
+.add-friend-btn:hover,
+.create-team-btn:hover,
+.create-channel-btn:hover {
+  background-color: #6952d9 !important;
+}
+
+
+/* Logout Button */
+.logout-btn {
+  margin-top: auto;
+  padding: 10px;
+  text-align: center;
+  background-color: #5865f2;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+.logout-btn:hover {
+  background-color: #4752c4;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: 280px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #1f1c2c; /* Matches the deep midnight theme */
+}
+
+/* View Containers */
+.view-container {
+  margin: auto;
+  text-align: center;
+  padding: 20px;
+  max-width: 800px;
+  width: 100%;
+}
+.view-container h1 {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+.view-container p {
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+.view-container button {
+  padding: 10px 20px;
+  background-color: #5865f2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+.view-container button:hover {
+  background-color: #4752c4;
+}
+
+/* Chat / DM View Styling */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.dm-header {
+  padding: 15px 20px;
+  background-color: #2f3136;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #202225;
+}
+.dm-header .username {
+  margin-left: 10px;
+}
+
+.chat-messages {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #1f1c2c;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.message__outer {
+  max-width: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+.message__bubble {
+  background-color: #40444b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.outgoing {
+  align-self: flex-end;
+}
+.outgoing .message__bubble {
+  background-color: #5865f2;
+}
+
+.incoming {
+  align-self: flex-start;
+}
+
+.chat-input-container {
+  padding: 15px 20px;
+  background-color: #2f3136;
+  border-top: 1px solid #202225;
+  display: flex;
+  align-items: center;
+}
+
+.chat-input {
+  flex-grow: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.send-button {
+  margin-left: 10px;
+  padding: 10px 16px;
+  background-color: #5865f2;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #fff;
+  transition: background-color 0.2s;
+}
+.send-button:hover {
+  background-color: #4752c4;
+}
+
+/* Modal Styling */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #2f3136;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #202225;
+  z-index: 1000;
+  width: 90%;
+  max-width: 400px;
+}
+.modal h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+.modal-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  border: none;
+  font-size: 14px;
+}
+.modal-button, .modal-close {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  margin-right: 8px;
+}
+.modal-button {
+  background-color: #5865f2;
+  color: #fff;
+}
+.modal-button:hover {
+  background-color: #4752c4;
+}
+.modal-close {
+  background-color: #555;
+  color: #fff;
+}
+.modal-close:hover {
+  background-color: #444;
+}
+
+/* ===== Auth Pages Styling ===== */
+/* These rules only affect the login, signup, forgot password, and other logged-out pages */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0e0e0e;
+}
+
+.auth-form-container {
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.message-bundle {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.message-timestamp {
+  font-size: 0.75rem;
+  color: #72767d;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+
+
