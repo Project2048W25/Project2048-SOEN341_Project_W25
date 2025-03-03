@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { Sidebar } from "./Sidebar";
-// import { Sidebar } from "../components/SideBar";
 import { AdminView } from "./AdminView";
 import { MemberView } from "./MemberView";
 import "./index.css";
@@ -12,21 +11,26 @@ export const AppChat = () => {
 
   useEffect(() => {
     const fetchUserRole = async () => {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: userError
+      } = await supabase.auth.getUser();
+
       if (userError) {
         console.error("Error fetching user:", userError);
         setLoading(false);
         return;
       }
       if (user) {
-        let { data, error } = await supabase
+        // Fetch role from "profiles"
+        const { data: profileData, error } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", user.id)
           .single();
 
-        if (!error) {
-          setRole(data.role);
+        if (!error && profileData) {
+          setRole(profileData.role);
         } else {
           console.error("Error fetching user role:", error);
         }
