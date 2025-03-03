@@ -6,7 +6,6 @@ import line1 from "../icons/line-1.svg";
 import line2 from "../icons/line-2.svg";
 import line3 from "../icons/line-3.svg";
 import google_icon from "../icons/devicon_google.svg";
-// import "../styles/tailwind.CSS/Login.css";
 import "../styles/tailwind.CSS/tailwind.css";
 import { signInWithEmail, signInWithGoogle } from "../services/authService";
 import { getProfileByUsername } from "../services/profileService";
