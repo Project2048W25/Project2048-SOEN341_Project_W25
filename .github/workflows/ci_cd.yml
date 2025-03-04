@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build Tailwind CSS
+        run: npm run tailwindcss-build
+
       - name: Run ESLint
         run: npx eslint . --ext .js,.jsx,.ts,.tsx || true
 
@@ -33,3 +36,6 @@ jobs:
 
       - name: Build React app
         run: npm run build
+
+      - name: Start Application
+        run: npm run start
