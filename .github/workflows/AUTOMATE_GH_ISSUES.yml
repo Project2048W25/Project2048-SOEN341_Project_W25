@@ -25,6 +25,9 @@ jobs:
           echo "sprint=sprint-1" >> $GITHUB_ENV
         fi
 
+    - name: checkout
+        uses: actions/checkout@v3
+        
     - name: Label new issue
       uses: actions-ecosystem/action-add-labels@v1
       with:
