@@ -11,21 +11,26 @@ export const AppChat = () => {
 
   useEffect(() => {
     const fetchUserRole = async () => {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: userError
+      } = await supabase.auth.getUser();
+
       if (userError) {
         console.error("Error fetching user:", userError);
         setLoading(false);
         return;
       }
       if (user) {
-        let { data, error } = await supabase
+        // Fetch role from "profiles"
+        const { data: profileData, error } = await supabase
           .from("profiles")
           .select("role")
           .eq("id", user.id)
           .single();
 
-        if (!error) {
-          setRole(data.role);
+        if (!error && profileData) {
+          setRole(profileData.role);
         } else {
           console.error("Error fetching user role:", error);
         }
@@ -43,7 +48,7 @@ export const AppChat = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <main className="main-container">
+      <main className="flex-1">
         {role === "Admin" ? <AdminView /> : <MemberView />}
       </main>
     </div>

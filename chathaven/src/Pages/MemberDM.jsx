@@ -1,65 +1,59 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+import "./index.css";
 
-const IncomingMessage = ({ message }) => {
-  return (
-    <div className="flex justify-start">
-      <div className="bg-gray-700 text-white p-3 rounded-lg w-3/4">
-        {message}
-      </div>
-    </div>
-  );
-};
-
-const OutgoingMessage = ({ message }) => {
-  return (
-    <div className="flex justify-end">
-      <div className="bg-blue-600 text-white p-3 rounded-lg w-3/4">
-        {message}
-      </div>
-    </div>
-  );
-};
-
-const MemberDM = () => {
+export const MemberDM = () => {
+  const { username } = useParams(); // Friend's username from the URL
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
+  // Handle sending message: adds message to local state
   const handleSend = () => {
     if (input.trim()) {
-      setMessages([...messages, { text: input, isOutgoing: true }]);
+      // For outgoing messages, label as "You"
+      setMessages([...messages, { sender: "You", text: input, isOutgoing: true }]);
       setInput("");
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSend();
+    }
+  };
+
   return (
-    <div className="bg-[#0e0523] h-screen flex flex-col p-4">
-      {/* Header */}
-      <div className="flex items-center p-2 text-white border-b border-gray-700">
-        <div className="w-8 h-8 bg-gray-400 rounded-full mr-2"></div>
-        <span className="text-lg">laury_14</span>
+    <div className="main-container">
+      {/* DM Header */}
+      <div className="dm-header">
+        <span className="username">{username}</span>
       </div>
-      
+
       {/* Chat Messages */}
-      <div className="flex flex-col flex-grow p-4 space-y-4 overflow-y-auto">
+      <div className="chat-messages">
         {messages.map((msg, index) => (
-          msg.isOutgoing ? (
-            <OutgoingMessage key={index} message={msg.text} />
-          ) : (
-            <IncomingMessage key={index} message={msg.text} />
-          )
+          <div key={index} className={`message ${msg.isOutgoing ? "outgoing" : "incoming"}`}>
+            <div className="message__outer">
+              <div className="message__bubble">
+                <strong>{msg.isOutgoing ? "You" : username}:</strong> {msg.text}
+              </div>
+            </div>
+          </div>
         ))}
       </div>
-      
+
       {/* Message Input */}
-      <div className="p-2 border-t border-gray-700 flex items-center">
+      <div className="chat-input-container">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Write message"
-          className="flex-grow p-2 bg-gray-800 text-white rounded-lg outline-none"
+          className="chat-input"
         />
-        <button onClick={handleSend} className="ml-2 bg-blue-600 text-white px-4 py-2 rounded-lg">Send</button>
+        <button onClick={handleSend} className="send-button">Send</button>
       </div>
     </div>
   );

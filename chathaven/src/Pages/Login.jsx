@@ -6,7 +6,6 @@ import line1 from "../icons/line-1.svg";
 import line2 from "../icons/line-2.svg";
 import line3 from "../icons/line-3.svg";
 import google_icon from "../icons/devicon_google.svg";
-// import "../styles/tailwind.CSS/Login.css";
 import "../styles/tailwind.CSS/tailwind.css";
 import { signInWithEmail, signInWithGoogle } from "../services/authService";
 import { getProfileByUsername } from "../services/profileService";
@@ -48,14 +47,12 @@ export const Login = () => {
     };
 
     let handleLoginWithGoogle = async (event) => {
-        event.preventDefault();
         const { data, error } = await signInWithGoogle();
         if (error) {
           console.error("Error signing in with Google:", error.message);
           window.alert("Failed to login with Google!");
         } else {
           console.log("User signed in with Google:", data);
-          window.location.href = '/app';
         }
     };
 
