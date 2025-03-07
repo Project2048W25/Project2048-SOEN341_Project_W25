@@ -45,6 +45,3 @@ jobs:
           CI=false npm run build
         env:
           NODE_ENV: production
-
-      - name: Start Application
-        run: cd chathaven && serve -s build
