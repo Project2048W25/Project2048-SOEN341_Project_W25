@@ -131,12 +131,12 @@ export const MemberDM = () => {
               </div>
               <div className="message__outer">
                 <div className="message__bubble">
-                  <div className="sender-name">
-                    {msg.user_id === currentUser?.id ? "You" : msg.profiles?.username || "Unknown"}
-                  </div>
-                  <div className="message-content">
-                    {msg.message}
-                  </div>
+                    <div className="sender-name">
+                      {msg.user_id === currentUser?.id ? "You" : msg.profiles?.username || "Unknown"}:
+                    </div>
+                    <div className="message-content">
+                      {msg.message}
+                    </div>
                 </div>
               </div>
             </div>
