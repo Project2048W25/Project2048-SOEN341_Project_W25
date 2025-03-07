@@ -39,3 +39,5 @@ jobs:
 
       - name: Start Application
         run: npm run start
+        env: 
+          NODE_ENV: production
