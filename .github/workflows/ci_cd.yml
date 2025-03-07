@@ -25,9 +25,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Tailwind CSS
-        run: npx @tailwindcss/cli -i ./src/index.css -o ./src/styles/tailwind.CSS/tailwind.css
-
       - name: Run ESLint
         run: npx eslint . --ext .js,.jsx,.ts,.tsx || true
 
