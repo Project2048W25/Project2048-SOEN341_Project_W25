@@ -23,19 +23,19 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: cd chathaven &&  npm install
         
       - name: install CRA
-        run: npm install react-scripts
+        run: cd chathaven && npm install react-scripts
 
       - name: Run ESLint
-        run: npx eslint . --ext .js,.jsx,.ts,.tsx || true
+        run:  cd chathaven && npx eslint . --ext .js,.jsx,.ts,.tsx || true
 
       - name: Run Stylelint
-        run: npx stylelint "**/*.{css,scss}" || true
+        run:  cd chathaven && npx stylelint "**/*.{css,scss}" || true
 
       - name: Build React app
-        run: npm run build
+        run:  cd chathaven && npm run build
 
       - name: Start Application
         run: npm run start
