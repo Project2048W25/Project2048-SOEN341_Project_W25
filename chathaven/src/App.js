@@ -20,6 +20,7 @@ import { Sidebar } from "./Pages/Sidebar";
 import { TeamAdminView } from "./Pages/TeamAdminView";
 import MemberDM from "./Pages/MemberDM";
 import ChannelDM from "./Pages/ChannelDM";
+import GoogleCallback from './Pages/GoogleCallback';
 
 function Layout() {
   const location = useLocation();
@@ -76,6 +77,7 @@ function Layout() {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/google-callback" element={<GoogleCallback />} />
           <Route path="/forgot" element={<ForgotPassword />} />
           <Route path="/app" element={<AppChat />} />
           <Route path="/admin" element={<TeamAdminView />} />

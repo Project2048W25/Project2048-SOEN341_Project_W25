@@ -132,7 +132,7 @@ export const MemberDM = () => {
               <div className="message__outer">
                 <div className="message__bubble">
                   <strong>
-                    {msg.user_id === currentUser?.id ? "You" : msg.profiles?.username || "Unknown"}:
+                    {msg.user_id === currentUser?.id ? "You" : username || "Unknown"}:
                   </strong>{" "}
                   {msg.message}
                 </div>
