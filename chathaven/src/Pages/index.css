@@ -298,6 +298,7 @@ html, body {
   .sender-name {
     text-align: right;
   }
+  background-color: #5865f2;
 }
 
 /* New sender name styling */
