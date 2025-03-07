@@ -13,8 +13,6 @@ export const ChannelDM = () => {
 
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
-
-  // We'll store team info for checking if user is the team owner
   const [teamOwnerId, setTeamOwnerId] = useState(null);
 
   // State for Context Menu
@@ -242,10 +240,12 @@ export const ChannelDM = () => {
               </div>
               <div className="message__outer">
                 <div className="message__bubble">
-                  <strong>
-                    {msg.user_id === user?.id ? "You" : msg.profiles?.username || "Unknown"}:
-                  </strong>{" "}
-                  {msg.message}
+                  <div className="sender-name">
+                    {msg.user_id === user?.id ? "You" : msg.profiles?.username || "Unknown"}
+                  </div>
+                  <div className="message-content">
+                    {msg.message}
+                  </div>
                 </div>
               </div>
             </div>
