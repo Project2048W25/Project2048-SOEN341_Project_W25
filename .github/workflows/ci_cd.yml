@@ -37,8 +37,13 @@ jobs:
         run: cd chathaven && npm run tailwindcss-build
         
 
-      - name: Build React app
-        run:  cd chathaven && npm run build
+      - name: Build React App in /chathaven
+        working-directory: chathaven
+        run: |
+          npm install
+          CI=false npm run build
+        env:
+          NODE_ENV: production
 
       - name: Start Application
         run: npm run start
