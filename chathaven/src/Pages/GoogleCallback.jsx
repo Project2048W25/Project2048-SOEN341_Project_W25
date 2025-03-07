@@ -43,12 +43,12 @@ const GoogleCallback = () => {
         if (!existingProfile) {
           setStatus('Creating profile for new user...')
 
-          // Use your createProfile() function
+          // Use createProfile() function
           const { data: newProfile, error: createError } = await createProfile({
             id: user.id,
             username: user.user_metadata?.username || user.email.split('@')[0],
-            password: 'temporary', // no raw password for OAuth
-            role: 'Member', // or "Admin" if you like
+            password: 'temporary', // No password for OAuth
+            role: 'Member', // Need a page for admin/member option
             email: user.email,
           })
 
@@ -60,9 +60,9 @@ const GoogleCallback = () => {
           console.log('Profile created for OAuth user:', newProfile)
         }
 
-        // 3. Redirect the user to your main app or dashboard
+        // 3. Redirect the user to main app or dashboard
         setStatus('Redirecting to the app...')
-        navigate('/app') // or wherever you want
+        navigate('/app')
       } catch (err) {
         console.error('Unexpected error:', err)
         setStatus('Something went wrong.')
