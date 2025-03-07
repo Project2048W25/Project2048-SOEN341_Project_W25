@@ -7,7 +7,7 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', sans-serif;
-  background-color: #1f1c2c; /* Deep midnight purple for dashboard */
+  background-color: #1f1c2c;
   color: #dcddde;
   height: 100vh;
   width: 100vw;
@@ -23,7 +23,7 @@ html, body {
 /* Sidebar Styling */
 .sidebar {
   width: 280px;
-  background-color: #2a2433; /* Updated dark purple/midnight tone */
+  background-color: #2a2433;
   color: #dcddde;
   display: flex;
   flex-direction: column;
@@ -32,7 +32,7 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh; /* Ensure the sidebar always reaches the bottom */
+  height: 100vh;
   overflow-y: auto;
   font-family: 'Inter', sans-serif;
 }
@@ -125,7 +125,6 @@ html, body {
   background-color: #6952d9 !important;
 }
 
-
 /* Logout Button */
 .logout-btn {
   margin-top: auto;
@@ -149,7 +148,7 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: #1f1c2c; /* Matches the deep midnight theme */
+  background-color: #1f1c2c;
 }
 
 /* View Containers */
@@ -205,6 +204,7 @@ html, body {
   margin-left: 10px;
 }
 
+/* Chat Messages */
 .chat-messages {
   flex-grow: 1;
   padding: 20px;
@@ -212,37 +212,102 @@ html, body {
   background-color: #1f1c2c;
 }
 
+/* Message Layout */
 .message {
   display: flex;
   margin-bottom: 12px;
 }
 
-.message__outer {
-  max-width: 70%;
-  display: flex;
-  flex-direction: column;
+/* Align entire message container based on type */
+.message.outgoing {
+  justify-content: flex-end;
+}
+.message.incoming {
+  justify-content: flex-start;
 }
 
+/* Message Layout */
+.message-bundle {
+  display: flex;
+  flex-direction: column;
+  max-width: 50%;  /* The bubble will not exceed 50% of the chat area */
+}
+
+.message.incoming .message-bundle {
+  align-items: flex-start;
+}
+
+.message.outgoing .message-bundle {
+  align-items: flex-end;
+}
+
+/* Timestamp styling */
+.message-timestamp {
+  font-size: 0.75rem;
+  color: #72767d;
+  margin-bottom: 4px;
+}
+
+.message.incoming .message-timestamp {
+  text-align: left;
+}
+
+.message.outgoing .message-timestamp {
+  text-align: right;
+}
+
+.message__outer {
+  display: block;
+  width: 100%;  /* Ensures the bubble is confined to the parent's width */
+}
+
+/* Message bubble styling */
 .message__bubble {
   background-color: #40444b;
   padding: 10px 14px;
   border-radius: 8px;
   font-size: 14px;
-  white-space: pre-wrap;
-  word-break: break-word;
+  white-space: pre-wrap;       /* Preserve newlines and allow wrapping */
+  word-wrap: break-word;       /* Older syntax for breaking long words */
+  overflow-wrap: break-word;   /* Standard syntax for breaking long words */
+  word-break: break-all;       /* Forces a break if a long word exceeds the limit */
+  display: inline-block;       /* Size to content up to the maximum width */
+  max-width: 100%;             /* Bubble will not exceed the width of its container */
 }
 
-.outgoing {
-  align-self: flex-end;
+.message.outgoing .message__outer {
+  text-align: right;
 }
-.outgoing .message__bubble {
+
+.message.incoming .message__outer {
+  text-align: left;
+}
+
+
+/* Align text based on message type */
+.message.incoming .message__bubble,
+.message.incoming .message__bubble .sender-name,
+.message.incoming .message__bubble .message-content {
+  text-align: left;
+}
+
+.message.outgoing .message__bubble,
+.message.outgoing .message__bubble .sender-name,
+.message.outgoing .message__bubble .message-content {
+  text-align: left;
+  .sender-name {
+    text-align: right;
+  }
   background-color: #5865f2;
 }
 
-.incoming {
-  align-self: flex-start;
+/* New sender name styling */
+.sender-name {
+  font-weight: bold;
+  margin-bottom: 4px;
 }
 
+/* Chat Input */
 .chat-input-container {
   padding: 15px 20px;
   background-color: #2f3136;
@@ -326,7 +391,6 @@ html, body {
 }
 
 /* ===== Auth Pages Styling ===== */
-/* These rules only affect the login, signup, forgot password, and other logged-out pages */
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -343,19 +407,3 @@ html, body {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
-
-.message-bundle {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 12px;
-}
-
-.message-timestamp {
-  font-size: 0.75rem;
-  color: #72767d;
-  margin-bottom: 4px;
-  text-align: center;
-}
-
-
-

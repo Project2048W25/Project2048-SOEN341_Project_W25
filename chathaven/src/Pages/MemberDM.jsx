@@ -10,7 +10,6 @@ export const MemberDM = () => {
   const [friendProfile, setFriendProfile] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
-
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -64,16 +63,17 @@ export const MemberDM = () => {
           table: "dms"
         },
         (payload) => {
-        const newMessage = payload.new;
-        if (
-          (newMessage.user_id === currentUser.id &&
-            newMessage.recipient_id === friendProfile.id) ||
-          (newMessage.user_id === friendProfile.id &&
-            newMessage.recipient_id === currentUser.id)
-        ) {
-          setMessages((prev) => [...prev, newMessage]);
+          const newMessage = payload.new;
+          if (
+            (newMessage.user_id === currentUser.id &&
+              newMessage.recipient_id === friendProfile.id) ||
+            (newMessage.user_id === friendProfile.id &&
+              newMessage.recipient_id === currentUser.id)
+          ) {
+            setMessages((prev) => [...prev, newMessage]);
+          }
         }
-      })
+      )
       .subscribe();
     
     return () => {
@@ -122,8 +122,8 @@ export const MemberDM = () => {
       <div className="chat-messages">
         {messages.map((msg) => (
           <div
-          key={msg.id}
-          className={`message ${msg.user_id === currentUser?.id ? "outgoing" : "incoming"}`}
+            key={msg.id}
+            className={`message ${msg.user_id === currentUser?.id ? "outgoing" : "incoming"}`}
           >
             <div className="message-bundle">
               <div className="message-timestamp">
@@ -131,10 +131,12 @@ export const MemberDM = () => {
               </div>
               <div className="message__outer">
                 <div className="message__bubble">
-                  <strong>
-                    {msg.user_id === currentUser?.id ? "You" : username || "Unknown"}:
-                  </strong>{" "}
-                  {msg.message}
+                    <div className="sender-name">
+                      {msg.user_id === currentUser?.id ? "You" : username || "Unknown"}:
+                    </div>
+                    <div className="message-content">
+                      {msg.message}
+                    </div>
                 </div>
               </div>
             </div>
