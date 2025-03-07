@@ -27,6 +27,8 @@ jobs:
         
       - name: install CRA
         run: cd chathaven && npm install react-scripts
+      - name: Install Serve
+        run: cd chathaven && npm install -g serve
 
       - name: Run ESLint
         run:  cd chathaven && npx eslint . --ext .js,.jsx,.ts,.tsx || true
@@ -45,6 +47,4 @@ jobs:
           NODE_ENV: production
 
       - name: Start Application
-        run: npm run start
-        env: 
-          NODE_ENV: production
+        run: cd chathaven && serve -s build
