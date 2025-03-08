@@ -1,5 +1,5 @@
 # ChatHaven - SOEN 341
-
+![CI/CD Pipeline](https://github.com/Project2048W25/Project2048-SOEN341_Project_W25/actions/workflows/ci_cd.yml/badge.svg)
 ## Description
 
 Finding a secure and minimal platform for both team collaboration and private messaging can be challenging. Many that do exist lack moderated chats and  customizable features for quality communication. ChatHaven provides a secure and user-friendly communication platform designed for seamless interaction. Whether working in teams, community networking, direct messaging with friends, users benefit from the clean interface, media-sharing capabilities, and many more features to come. Built with safety and privacy in mind, ChatHaven is safe for all ages.
