@@ -29,7 +29,6 @@ export const ChannelDM = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
-        // fetch role from profiles
         const { data: profileData } = await supabase
           .from("profiles")
           .select("role")
@@ -78,17 +77,16 @@ export const ChannelDM = () => {
     fetchChannelDetails();
     fetchMessages();
 
-    // Real-time subscription for INSERT and DELETE events
+    // Real-time subscription for messages INSERT and DELETE
     const messageSubscription = supabase
       .channel("messages")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages" },
         (payload) => {
-          if (payload.new.channel_id === Number(channelId)) {
+          if (payload.new.channel_id === channelId) {
             (async () => {
               const newMsg = payload.new;
-              // fetch username if missing
               const { data: profileData, error } = await supabase
                 .from("profiles")
                 .select("username")
@@ -98,7 +96,6 @@ export const ChannelDM = () => {
                 newMsg.profiles = { username: profileData.username };
               }
               setMessages((prev) => {
-                // Avoid duplicate if message already exists
                 if (prev.some((m) => m.id === newMsg.id)) return prev;
                 return [...prev, newMsg];
               });
@@ -110,7 +107,7 @@ export const ChannelDM = () => {
         "postgres_changes",
         { event: "DELETE", schema: "public", table: "messages" },
         (payload) => {
-          if (payload.old.channel_id === Number(channelId)) {
+          if (payload.old.channel_id === channelId) {
             setMessages((prev) => prev.filter((m) => m.id !== payload.old.id));
           }
         }
@@ -122,7 +119,6 @@ export const ChannelDM = () => {
     };
   }, [channelId]);
 
-  // Send new message with optimistic update
   const handleSend = async () => {
     if (!input.trim() || !user) return;
     const { data, error } = await supabase
@@ -153,7 +149,7 @@ export const ChannelDM = () => {
     }
   };
 
-  // Context Menu Component integrated into ChannelDM
+  // Context Menu Component
   const ContextMenu = ({ x, y, message, onClose }) => {
     const handleCopy = () => {
       navigator.clipboard.writeText(message.message);
@@ -171,7 +167,6 @@ export const ChannelDM = () => {
             if (error) {
               console.error("Error deleting message:", error);
             } else {
-              // Update local state immediately as fallback
               setMessages((prev) => prev.filter((m) => m.id !== message.id));
             }
           });
@@ -204,55 +199,35 @@ export const ChannelDM = () => {
     );
   };
 
-  // Right-click handler to show context menu
-  const handleContextMenu = (e, msg) => {
-    e.preventDefault();
-    setContextMenu({
-      visible: true,
-      x: e.clientX,
-      y: e.clientY,
-      message: msg,
-    });
-  };
-
-  // Format timestamp (customize format as desired)
-  const formatTimestamp = (timestamp) => {
-    const dateObj = new Date(timestamp);
-    return dateObj.toLocaleString();
-  };
-
   return (
     <div className="main-container">
       <div className="dm-header">
         <span className="username">#{channelName}</span>
       </div>
-
       <div className="chat-messages">
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={`message ${msg.user_id === user?.id ? "outgoing" : "incoming"}`}
-            onContextMenu={(e) => handleContextMenu(e, msg)}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              setContextMenu({ visible: true, x: e.clientX, y: e.clientY, message: msg });
+            }}
           >
             <div className="message-bundle">
-              <div className="message-timestamp">
-                {formatTimestamp(msg.created_at)}
-              </div>
+              <div className="message-timestamp">{new Date(msg.created_at).toLocaleString()}</div>
               <div className="message__outer">
                 <div className="message__bubble">
                   <div className="sender-name">
                     {msg.user_id === user?.id ? "You" : msg.profiles?.username || "Unknown"}
                   </div>
-                  <div className="message-content">
-                    {msg.message}
-                  </div>
+                  <div className="message-content">{msg.message}</div>
                 </div>
               </div>
             </div>
           </div>
         ))}
       </div>
-
       <div className="chat-input-container">
         <input
           type="text"
@@ -266,15 +241,12 @@ export const ChannelDM = () => {
           Send
         </button>
       </div>
-
       {contextMenu.visible && (
         <ContextMenu
           x={contextMenu.x}
           y={contextMenu.y}
           message={contextMenu.message}
-          onClose={() =>
-            setContextMenu({ ...contextMenu, visible: false, message: null })
-          }
+          onClose={() => setContextMenu({ ...contextMenu, visible: false, message: null })}
         />
       )}
     </div>

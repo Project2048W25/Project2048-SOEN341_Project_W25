@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
 import "./index.css";
 
 export const Sidebar = () => {
-  // User & role state (including username for profile display)
+  // User & role state
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState(null);
   const [role, setRole] = useState(null);
@@ -12,7 +12,11 @@ export const Sidebar = () => {
   // Teams & Channels
   const [teams, setTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
-  const [channels, setChannels] = useState([]);
+
+  // For channels display: all channels and membership info
+  const [allChannels, setAllChannels] = useState([]);
+  const [myMemberships, setMyMemberships] = useState([]);
+  const [channelsForDisplay, setChannelsForDisplay] = useState([]);
 
   // Friends & friend requests
   const [friends, setFriends] = useState([]);
@@ -31,153 +35,235 @@ export const Sidebar = () => {
   const [selectedChannel, setSelectedChannel] = useState(null);
   const [usernameToAdd, setUsernameToAdd] = useState("");
 
+  const [showJoinRequestModal, setShowJoinRequestModal] = useState(false);
+  const [pendingChannel, setPendingChannel] = useState(null);
+
   // Add Friend Modal
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
   const [friendUsername, setFriendUsername] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Fetch user data, profile info, teams, friends, friend requests
+  // Determine if a channel is selected based on URL
+  const currentChannelId = location.pathname.startsWith("/channel/")
+    ? location.pathname.split("/channel/")[1]
+    : null;
+
+  // ----------------------------
+  // Clear any persisted team selection on mount so default is "none"
+  // ----------------------------
   useEffect(() => {
-    const fetchAllData = async () => {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) {
-        console.error("Error fetching user:", userError);
-        return;
-      }
-      setUser(user);
-      if (!user) return;
+    localStorage.removeItem("selectedTeam");
+    setSelectedTeam(null);
+  }, []);
 
-      // Fetch profile info (username, role)
-      const { data: profileData, error: profileFetchError } = await supabase
-        .from("profiles")
-        .select("username, role")
-        .eq("id", user.id)
-        .single();
-      if (profileFetchError) {
-        console.error("Error fetching profile:", profileFetchError);
-        return;
-      }
-      if (profileData) {
-        setRole(profileData.role);
-        setUsername(profileData.username);
-      }
+  // Persist selected team when user explicitly chooses one
+  const handleTeamSelect = (teamData) => {
+    setSelectedTeam(teamData);
+    localStorage.setItem("selectedTeam", JSON.stringify(teamData));
+  };
 
-      // Fetch teams
-      const { data: teamsData, error: teamsError } = await supabase
-        .from("team_members")
-        .select("team_id, teams(id, name, owner_id)")
-        .eq("user_id", user.id);
-      if (teamsError) {
-        console.error("Error fetching teams:", teamsError);
-      } else {
-        setTeams(teamsData || []);
-      }
+  // ----------------------------
+  // Fetch basic user info, teams, friends, etc.
+  // ----------------------------
+  const fetchAllData = async () => {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+      console.error("Error fetching user:", userError);
+      return;
+    }
+    setUser(user);
+    if (!user) return;
 
-      // Fetch accepted friends
-      const { data: acceptedFriends, error: friendsError } = await supabase
-        .from("friends")
-        .select(
-          "id, sender_id, receiver_id, sender:sender_id ( id, username ), receiver:receiver_id ( id, username )"
-        )
-        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-        .eq("status", "accepted")
-        .order("created_at", { ascending: false });
-      if (friendsError) {
-        console.error("Error fetching friends:", friendsError);
-      } else {
-        setFriends(acceptedFriends || []);
-      }
+    const { data: profileData, error: profileFetchError } = await supabase
+      .from("profiles")
+      .select("username, role")
+      .eq("id", user.id)
+      .single();
+    if (profileFetchError) {
+      console.error("Error fetching profile:", profileFetchError);
+      return;
+    }
+    if (profileData) {
+      setRole(profileData.role);
+      setUsername(profileData.username);
+    }
 
-      // Fetch pending friend requests (where current user is receiver)
-      const { data: pendingRequests, error: requestsError } = await supabase
-        .from("friends")
-        .select("id, sender_id, receiver_id, sender:sender_id ( id, username )")
-        .eq("receiver_id", user.id)
-        .eq("status", "pending")
-        .order("created_at", { ascending: false });
-      if (requestsError) {
-        console.error("Error fetching friend requests:", requestsError);
-      } else {
-        setFriendRequests(pendingRequests || []);
-      }
-    };
+    const { data: teamsData, error: teamsError } = await supabase
+      .from("team_members")
+      .select("team_id, teams(id, name, owner_id)")
+      .eq("user_id", user.id);
+    if (teamsError) {
+      console.error("Error fetching teams:", teamsError);
+    } else {
+      setTeams(teamsData || []);
+    }
 
+    const { data: acceptedFriends, error: friendsError } = await supabase
+      .from("friends")
+      .select("id, sender_id, receiver_id, sender:sender_id ( id, username ), receiver:receiver_id ( id, username )")
+      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+      .eq("status", "accepted")
+      .order("created_at", { ascending: false });
+    if (friendsError) {
+      console.error("Error fetching friends:", friendsError);
+    } else {
+      setFriends(acceptedFriends || []);
+    }
+
+    const { data: pendingRequests, error: requestsError } = await supabase
+      .from("friends")
+      .select("id, sender_id, receiver_id, sender:sender_id ( id, username )")
+      .eq("receiver_id", user.id)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
+    if (requestsError) {
+      console.error("Error fetching friend requests:", requestsError);
+    } else {
+      setFriendRequests(pendingRequests || []);
+    }
+  };
+
+  useEffect(() => {
     fetchAllData();
-
-    // Real-time subscriptions for friend updates
     const friendsSubscription = supabase
       .channel("friends_updates")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "friends" }, () => {
-        fetchAllData();
-      })
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "friends" }, () => {
-        fetchAllData();
-      })
-      .on("postgres_changes", { event: "DELETE", schema: "public", table: "friends" }, () => {
-        fetchAllData();
-      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "friends" }, fetchAllData)
       .subscribe();
-
     return () => {
       supabase.removeChannel(friendsSubscription);
     };
   }, []);
 
-  // Fetch channels when a team is selected
+  // ----------------------------
+  // Subscribe to team_members changes for real-time updates
+  // ----------------------------
   useEffect(() => {
-    if (!selectedTeam) {
-      setChannels([]);
-      return;
-    }
-    const fetchChannels = async () => {
-      const { data, error } = await supabase
-        .from("channels")
-        .select("*")
-        .eq("team_id", selectedTeam.id);
-      if (error) {
-        console.error("Error fetching channels:", error);
-      } else {
-        setChannels(data || []);
-      }
-    };
-    fetchChannels();
-
-    // Real-time subscription for channel updates
-    const channelSubscription = supabase
-      .channel("channel_updates")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "channels" }, (payload) => {
-        if (payload.new.team_id === selectedTeam.id) {
-          fetchChannels();
+    if (!user) return;
+    const teamsSubscription = supabase
+      .channel("team_members_updates")
+      .on("postgres_changes", { event: "*", schema: "public", table: "team_members" }, (payload) => {
+        if (payload.new?.user_id === user.id || payload.old?.user_id === user.id) {
+          fetchAllData();
         }
       })
       .subscribe();
+    return () => {
+      supabase.removeChannel(teamsSubscription);
+    };
+  }, [user]);
+
+  // ----------------------------
+  // Fetch channels and memberships for the current team
+  // ----------------------------
+  useEffect(() => {
+    if (!selectedTeam || !user) {
+      setAllChannels([]);
+      setMyMemberships([]);
+      setChannelsForDisplay([]);
+      return;
+    }
+
+    const fetchChannelsAndMemberships = async () => {
+      const { data: teamChannels, error: chanError } = await supabase
+        .from("channels")
+        .select("*")
+        .eq("team_id", selectedTeam.id);
+      if (chanError) {
+        console.error("Error fetching channels:", chanError);
+        setAllChannels([]);
+      } else {
+        setAllChannels(teamChannels || []);
+      }
+
+      const { data: memberships, error: memError } = await supabase
+        .from("channel_members")
+        .select("id, channel_id, status")
+        .eq("user_id", user.id);
+      if (memError) {
+        console.error("Error fetching channel_members:", memError);
+        setMyMemberships([]);
+      } else {
+        setMyMemberships(memberships || []);
+      }
+    };
+
+    fetchChannelsAndMemberships();
+
+    const channelsSub = supabase
+      .channel("channels_realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "channels" }, fetchChannelsAndMemberships)
+      .subscribe();
+
+    const membershipSub = supabase
+      .channel("channel_members_realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "channel_members" }, fetchChannelsAndMemberships)
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(channelSubscription);
+      supabase.removeChannel(channelsSub);
+      supabase.removeChannel(membershipSub);
     };
-  }, [selectedTeam]);
+  }, [selectedTeam, user]);
 
-  // Navigate to DM view for a friend
-  const handleUserClick = (friend) => {
-    const isSender = friend.sender_id === user?.id;
-    const friendProfile = isSender ? friend.receiver : friend.sender;
-    navigate(`/dm/${friendProfile.username}`);
+  // Combine channels with membership info
+  useEffect(() => {
+    if (!allChannels.length) {
+      setChannelsForDisplay([]);
+      return;
+    }
+    const combined = allChannels.map((ch) => {
+      const membership = myMemberships.find((m) => m.channel_id === ch.id);
+      return {
+        ...ch,
+        membershipStatus: membership ? membership.status : "none",
+      };
+    });
+    setChannelsForDisplay(combined);
+  }, [allChannels, myMemberships]);
+
+  // ----------------------------
+  // Request to join channel
+  // ----------------------------
+  const requestToJoinChannel = async (channel) => {
+    try {
+      const { error } = await supabase
+        .from("channel_members")
+        .insert([{ channel_id: channel.id, user_id: user.id, status: "pending" }]);
+      if (error) {
+        alert("Error requesting to join channel: " + error.message);
+      } else {
+        alert(`Join request sent for channel: ${channel.title}`);
+      }
+    } catch (err) {
+      console.error("Error requesting to join channel:", err);
+    }
   };
 
-  // ==========================
+  // ----------------------------
+  // Channel click handler
+  // ----------------------------
+  const handleChannelClick = (channel) => {
+    if (channel.membershipStatus === "accepted") {
+      navigate(`/channel/${channel.id}`);
+    } else {
+      setPendingChannel(channel);
+      setShowJoinRequestModal(true);
+    }
+  };
+
+  // ----------------------------
   // Create Team
-  // ==========================
+  // ----------------------------
   const createTeam = async () => {
     if (!newTeamName) return;
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) {
+      if (userError || !user) {
         console.error("Error getting user for createTeam:", userError);
         return;
       }
-      if (!user) return;
-
       const { data, error } = await supabase
         .from("teams")
         .insert([{ name: newTeamName, owner_id: user.id }])
@@ -186,35 +272,45 @@ export const Sidebar = () => {
         console.error("Error creating team:", error);
         return;
       }
-
       if (data && data.length > 0) {
         const newTeam = data[0];
-        const { error: memberError } = await supabase
-          .from("team_members")
-          .insert([{ team_id: newTeam.id, user_id: user.id, invited_by: user.id }]);
-        if (memberError) {
-          console.error("Error adding self to new team:", memberError);
+        await supabase.from("team_members").insert([{ team_id: newTeam.id, user_id: user.id, invited_by: user.id }]);
+        const { data: channelData, error: channelError } = await supabase
+          .from("channels")
+          .insert([{ title: "all-general", team_id: newTeam.id, creator_id: user.id }])
+          .select();
+        if (channelError) {
+          console.error("Error creating default channel:", channelError);
+        } else if (channelData && channelData.length > 0) {
+          await supabase.from("channel_members").insert([{ channel_id: channelData[0].id, user_id: user.id, status: "accepted" }]);
         }
       }
       setNewTeamName("");
       setShowTeamModal(false);
+      fetchAllData();
     } catch (err) {
       console.error("Error in createTeam:", err);
     }
   };
 
-  // ==========================
-  // Create Channel
-  // ==========================
+  // ----------------------------
+  // Create Channel (normal addition: status accepted)
+  // ----------------------------
   const createChannel = async () => {
     if (!selectedTeam || !newChannelName) return;
     try {
-      const { error: channelError } = await supabase
+      const { data: channelData, error: channelError } = await supabase
         .from("channels")
-        .insert([{ title: newChannelName, team_id: selectedTeam.id }]);
+        .insert([{ title: newChannelName, team_id: selectedTeam.id, creator_id: user.id }])
+        .select();
       if (channelError) {
         console.error("Error creating channel:", channelError);
-      } else {
+      } else if (channelData && channelData.length > 0) {
+        const channelId = channelData[0].id;
+        await supabase.from("channel_members").insert([{ channel_id: channelId, user_id: user.id, status: "accepted" }]);
+        if (selectedTeam.owner_id && selectedTeam.owner_id !== user.id) {
+          await supabase.from("channel_members").insert([{ channel_id: channelId, user_id: selectedTeam.owner_id, status: "accepted" }]);
+        }
         setNewChannelName("");
         setShowChannelModal(false);
       }
@@ -223,9 +319,9 @@ export const Sidebar = () => {
     }
   };
 
-  // ==========================
-  // Invite user to Team
-  // ==========================
+  // ----------------------------
+  // Invite User to Team (and add them to default channel "all-general")
+  // ----------------------------
   const openInviteTeamModal = (team) => {
     setTeamToInvite(team);
     setInviteUsername("");
@@ -236,12 +332,10 @@ export const Sidebar = () => {
     if (!teamToInvite || !inviteUsername) return;
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) {
+      if (userError || !user) {
         console.error("Error getting user for inviteUserToTeam:", userError);
         return;
       }
-      if (!user) return;
-
       const { data: profileData, error: getProfileError } = await supabase
         .from("profiles")
         .select("id")
@@ -255,7 +349,6 @@ export const Sidebar = () => {
         alert("User not found.");
         return;
       }
-
       const userId = profileData.id;
       const { error: insertError } = await supabase
         .from("team_members")
@@ -264,18 +357,30 @@ export const Sidebar = () => {
         alert("Error inviting user: " + insertError.message);
         return;
       }
+      const { data: defaultChannel, error: defaultChannelError } = await supabase
+        .from("channels")
+        .select("*")
+        .eq("team_id", teamToInvite.id)
+        .eq("title", "all-general")
+        .single();
+      if (defaultChannelError) {
+        console.error("Error fetching default channel:", defaultChannelError);
+      } else if (defaultChannel) {
+        await supabase.from("channel_members").insert([{ channel_id: defaultChannel.id, user_id: userId, status: "accepted" }]);
+      }
       alert("User invited to the team!");
       setShowInviteTeamModal(false);
       setInviteUsername("");
       setTeamToInvite(null);
+      fetchAllData();
     } catch (err) {
       console.error("Error inviting user to team:", err);
     }
   };
 
-  // ==========================
-  // Add user to Channel
-  // ==========================
+  // ----------------------------
+  // Add User to Channel (normal addition: status accepted)
+  // ----------------------------
   const openAddUserModal = (channel) => {
     setSelectedChannel(channel);
     setUsernameToAdd("");
@@ -298,7 +403,6 @@ export const Sidebar = () => {
         alert("No user found with that username");
         return;
       }
-
       const userId = userData.id;
       const { data: membershipData, error: membershipError } = await supabase
         .from("team_members")
@@ -314,10 +418,9 @@ export const Sidebar = () => {
         alert("That user is not in this team. Invite them first.");
         return;
       }
-
       const { error: insertError } = await supabase
         .from("channel_members")
-        .insert([{ channel_id: selectedChannel.id, user_id: userId }]);
+        .insert([{ channel_id: selectedChannel.id, user_id: userId, status: "accepted" }]);
       if (insertError) {
         alert("Error adding user to channel: " + insertError.message);
         return;
@@ -326,14 +429,17 @@ export const Sidebar = () => {
       setShowAddUserModal(false);
       setUsernameToAdd("");
       setSelectedChannel(null);
+      setTimeout(() => {
+        setAllChannels((prev) => [...prev]);
+      }, 300);
     } catch (err) {
       console.error("Error adding user to channel:", err);
     }
   };
 
-  // ==========================
-  // Send Friend Request
-  // ==========================
+  // ----------------------------
+  // Friend Request Functions
+  // ----------------------------
   const sendFriendRequest = async () => {
     if (!friendUsername) {
       alert("Please enter a username.");
@@ -358,7 +464,6 @@ export const Sidebar = () => {
         alert("You cannot add yourself as a friend.");
         return;
       }
-
       const { data: existingRequest, error: existingError } = await supabase
         .from("friends")
         .select("id, status")
@@ -378,7 +483,6 @@ export const Sidebar = () => {
           return;
         }
       }
-
       const { error: insertError } = await supabase
         .from("friends")
         .insert([{ sender_id: user.id, receiver_id: receiverId, status: "pending" }]);
@@ -389,14 +493,12 @@ export const Sidebar = () => {
       alert("Friend request sent!");
       setFriendUsername("");
       setShowAddFriendModal(false);
+      fetchAllData();
     } catch (err) {
       console.error("Error sending friend request:", err);
     }
   };
 
-  // ==========================
-  // Accept / Decline Friend Request
-  // ==========================
   const acceptFriendRequest = async (requestId) => {
     try {
       await supabase
@@ -404,6 +506,7 @@ export const Sidebar = () => {
         .update({ status: "accepted" })
         .eq("id", requestId);
       alert("Friend request accepted!");
+      fetchAllData();
     } catch (err) {
       console.error("Error accepting friend request:", err);
     }
@@ -413,17 +516,41 @@ export const Sidebar = () => {
     try {
       await supabase.from("friends").delete().eq("id", requestId);
       alert("Friend request declined!");
+      fetchAllData();
     } catch (err) {
       console.error("Error declining friend request:", err);
     }
   };
 
-  // Helper: Check if current user is the team owner
-  const userIsOwnerOf = (team) => {
-    return team && team.owner_id === user?.id;
+  // Helper: check if user is team owner
+  const userIsOwnerOf = (team) => team && team.owner_id === user?.id;
+
+  // ----------------------------
+  // Leave Channel (for non-Admin)
+  // ----------------------------
+  const leaveChannel = async () => {
+    if (!user || !currentChannelId) return;
+    try {
+      const { error } = await supabase
+        .from("channel_members")
+        .delete()
+        .eq("channel_id", currentChannelId)
+        .eq("user_id", user.id);
+      if (error) {
+        console.error("Error leaving channel:", error);
+        alert("Error leaving channel.");
+      } else {
+        alert("You have left the channel.");
+        navigate("/app");
+      }
+    } catch (err) {
+      console.error("Error leaving channel:", err);
+    }
   };
 
-  // Logout function
+  // ----------------------------
+  // Logout
+  // ----------------------------
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
@@ -437,7 +564,7 @@ export const Sidebar = () => {
         <div className="role">{role || "Member"}</div>
       </div>
 
-      {/* Direct Messages Section */}
+      {/* Direct Messages */}
       <div className="section">
         <span className="sidebar-section-title">Direct Messages</span>
         <ul className="dm-list">
@@ -445,7 +572,11 @@ export const Sidebar = () => {
             const isSender = f.sender_id === user?.id;
             const friendProfile = isSender ? f.receiver : f.sender;
             return (
-              <li key={f.id} className="dm-item" onClick={() => handleUserClick(f)}>
+              <li
+                key={f.id}
+                className="dm-item"
+                onClick={() => navigate(`/dm/${friendProfile.username}`)}
+              >
                 {friendProfile?.username}
               </li>
             );
@@ -481,7 +612,7 @@ export const Sidebar = () => {
             const canManageTeam = role === "Admin" && userIsOwnerOf(teamData);
             return (
               <li key={team_id} className="team-item" style={{ display: "flex", alignItems: "center" }}>
-                <button style={{ flex: 1, marginRight: "6px" }} onClick={() => setSelectedTeam(teamData)}>
+                <button style={{ flex: 1, marginRight: "6px" }} onClick={() => handleTeamSelect(teamData)}>
                   {teamData.name || "Unnamed Team"}
                 </button>
                 {canManageTeam && (
@@ -503,37 +634,49 @@ export const Sidebar = () => {
       {/* Channels Section */}
       {selectedTeam && (
         <div className="section">
-          <div className="sidebar-section-title">
-            {selectedTeam.name}
-          </div>
+          <div className="sidebar-section-title">{selectedTeam.name}</div>
           <ul className="channel-list">
-            {channels.map((channel) => (
-              <li
-                key={channel.id}
-                className="channel-item"
-                onClick={() => navigate(`/channel/${channel.id}`)}
-                style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-              >
-                <span>{channel.title}</span>
-                {role === "Admin" && userIsOwnerOf(selectedTeam) && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent navigating to the channel
-                      openAddUserModal(channel);
-                    }}
-                  >
-                    👤+
-                  </button>
-                )}
-              </li>
-            ))}
+            {channelsForDisplay.map((channel) => {
+              const locked = channel.membershipStatus !== "accepted";
+              return (
+                <li
+                  key={channel.id}
+                  className="channel-item"
+                  onClick={() => handleChannelClick(channel)}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    opacity: locked ? 0.6 : 1,
+                    cursor: "pointer",
+                  }}
+                >
+                  <span>{locked ? "🔒 " : ""}{channel.title}</span>
+                  {!locked && channel.creator_id === user.id && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openAddUserModal(channel);
+                      }}
+                    >
+                      👤+
+                    </button>
+                  )}
+                </li>
+              );
+            })}
           </ul>
-          {selectedTeam && role === "Admin" && userIsOwnerOf(selectedTeam) && (
-            <button className="create-channel-btn" onClick={() => setShowChannelModal(true)}>
-              Create Channel
-            </button>
-          )}
+          <button className="create-channel-btn" onClick={() => setShowChannelModal(true)}>
+            Create Channel
+          </button>
         </div>
+      )}
+
+      {/* Leave Channel (non‑Admin only) */}
+      {currentChannelId && role !== "Admin" && (
+        <button className="leave-channel-btn" onClick={leaveChannel} style={{ color: "red", marginBottom: "10px" }}>
+          Leave Channel
+        </button>
       )}
 
       {/* ============ MODALS ============ */}
@@ -628,6 +771,33 @@ export const Sidebar = () => {
           </button>
           <button className="modal-close" onClick={() => setShowAddFriendModal(false)}>
             Close
+          </button>
+        </div>
+      )}
+
+      {/* Join Request Confirmation Modal */}
+      {showJoinRequestModal && pendingChannel && (
+        <div className="modal">
+          <h4>Request to Join</h4>
+          <p>Do you want to request to join the channel "{pendingChannel.title}"?</p>
+          <button
+            className="modal-button"
+            onClick={async () => {
+              await requestToJoinChannel(pendingChannel);
+              setShowJoinRequestModal(false);
+              setPendingChannel(null);
+            }}
+          >
+            Confirm
+          </button>
+          <button
+            className="modal-close"
+            onClick={() => {
+              setShowJoinRequestModal(false);
+              setPendingChannel(null);
+            }}
+          >
+            Cancel
           </button>
         </div>
       )}

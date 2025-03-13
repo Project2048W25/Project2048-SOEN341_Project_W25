@@ -407,3 +407,51 @@ html, body {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+
+/* Channel Dashboard Layout */
+.channel-dashboard {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.channel-dm-container {
+  flex: 3; /* Approximately 70-75% of width */
+  overflow: hidden;
+}
+
+.members-list-container {
+  flex: 1; /* Approximately 25-30% of width */
+  background-color: #2a2433;
+  overflow-y: auto;
+  border-left: 1px solid #1f1a25;
+}
+
+/* Members List Styling */
+.members-list {
+  padding: 20px;
+  color: #dcddde;
+}
+
+.members-list h4 {
+  margin: 0 0 10px;
+}
+
+.members-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.members-list li {
+  padding: 8px 10px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.members-list li:hover {
+  background-color: #393c43;
+}
+
