@@ -19,7 +19,7 @@ import { MemberView } from "./Pages/MemberView";
 import { Sidebar } from "./Pages/Sidebar";
 import { TeamAdminView } from "./Pages/TeamAdminView";
 import MemberDM from "./Pages/MemberDM";
-import ChannelDM from "./Pages/ChannelDM";
+import ChannelDashboard from "./Pages/ChannelDashboard"; // updated import
 import GoogleCallback from './Pages/GoogleCallback';
 
 function Layout() {
@@ -48,7 +48,6 @@ function Layout() {
     };
   }, []);
 
-  // Wait until session check is complete
   if (loading) {
     return <div className="text-white text-center mt-10">Loading...</div>;
   }
@@ -84,7 +83,8 @@ function Layout() {
           <Route path="/admin/:teamId" element={<AdminView />} />
           <Route path="/member" element={<MemberView />} />
           <Route path="/dm/:username" element={<MemberDM />} />
-          <Route path="/channel/:channelId" element={<ChannelDM />} />
+          {/* Updated route: wrap channel view with dashboard */}
+          <Route path="/channel/:channelId" element={<ChannelDashboard />} />
         </Routes>
       </div>
     </div>
