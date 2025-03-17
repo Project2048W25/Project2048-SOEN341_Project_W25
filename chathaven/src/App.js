@@ -8,8 +8,7 @@ import {
 } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from './utils/supabaseClient';
-
-import './index.css';
+import './root_index.css';
 import { Login } from "./Pages/Login";
 import { Signup } from "./Pages/Signup";
 import { ForgotPassword } from "./Pages/ForgotPassword";
@@ -63,7 +62,7 @@ function Layout() {
   }
 
   // Show the sidebar on certain routes
-  const showSidebar = ["/dm", "/channel", "/app", "/admin", "/member"];
+  const showSidebar = ["/dm", "/channel", "/admin", "/member"];
   const shouldShowSidebar = showSidebar.some((path) =>
     location.pathname.startsWith(path)
   );
@@ -94,12 +93,13 @@ function Layout() {
 function App() {
   return (
     <>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{'ChatHaven'}</title>
-        <link rel="icon" type="image/x-icon" href={logo} />
-      </head>
+      {/*<head>*/}
+      {/*  <meta charSet="utf-8" />*/}
+      {/*  <meta name="viewport" content="width=device-width, initial-scale=1" />*/}
+      {/*  <title>{'ChatHaven'}</title>*/}
+      {/*  <link rel="icon" type="image/x-icon" href={logo}  />*/}
+      {/*  <link rel="manifest" href="/manifest.json" />*/}
+      {/*</head>*/}
       <Router>
         <Layout />
       </Router>

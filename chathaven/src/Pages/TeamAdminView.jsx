@@ -2,7 +2,6 @@ import React from "react";
 import "../styles/tailwind.CSS/tailwind.css";
 import {SideBar} from "../components/SideBar";
 import {ActiveChatView} from "../components/ActiveChatView";
-import {ChatHeader} from "../components/ChatHeader";
 
 export const TeamAdminView = () => {
 
