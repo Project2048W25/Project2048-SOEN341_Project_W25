@@ -156,7 +156,15 @@ export const MembersList = ({ channelId }) => {
     }
   };
 
-  //Get the live status updates of the members
+  // Get the live status updates of the members
+  const updateProfileStatus = (prev, payload) =>{
+    return prev.map((m) =>
+      m.user_id === payload.new.id
+        ? {...m, profiles: {...m.profiles, status: payload.new.status}}
+        : m
+    );
+  };
+
   useEffect(() => {
     const statusSubscription = supabase
       .channel("profiles_status")
@@ -164,22 +172,13 @@ export const MembersList = ({ channelId }) => {
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "profiles" },
         (payload) => {
-          setAccepted((prev) =>
-            prev.map((m) =>
-              m.user_id === payload.new.id
-                ? { ...m, profiles: { ...m.profiles, status: payload.new.status } }
-                : m
-            )
-          );
+        setAccepted((prev) => updateProfileStatus(prev, payload)); // Use helper function
         }
-      )
-      .subscribe();
-  
-    return () => {
-      supabase.removeChannel(statusSubscription);
-    };
-  }, []);
-  
+      );
+
+      return () => statusSubscription.unsubscribe();
+  },[]);
+    
   
 
   return (
