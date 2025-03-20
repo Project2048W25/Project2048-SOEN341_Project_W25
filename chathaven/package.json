@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emoji-mart/data": "^1.2.1",
+    "@emoji-mart/react": "^1.1.1",
     "@react-oauth/google": "^0.12.1",
     "@supabase/supabase-js": "^2.48.1",
     "@tailwindcss/postcss": "^4.0.6",
     "autoprefixer": "^10.4.20",
     "cra-template": "1.2.0",
+    "emoji-mart": "^5.6.0",
     "husky": "^9.1.7",
+    "install": "^0.13.0",
     "lint-staged": "^15.4.3",
+    "npm": "^11.2.0",
     "postcss": "^8.5.2",
     "prettier": "^3.5.1",
     "react": "^18.3.1",
@@ -20,14 +25,12 @@
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "tailwindcss-build": "npx @tailwindcss/cli -i ./src/index.css -o ./src/styles/tailwind.CSS/tailwind.css",
-    "tailwindcss-build-watch": "npx @tailwindcss/cli -i ./src/index.css -o ./src/styles/tailwind.CSS/tailwind.css --watch",
+    "tailwindcss-build": "npx @tailwindcss/cli -i src/root_index.css -o ./src/styles/tailwind.CSS/tailwind.css",
+    "tailwindcss-build-watch": "npx @tailwindcss/cli -i src/root_index.css -o ./src/styles/tailwind.CSS/tailwind.css --watch",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
     "upgrade-CRA": "npm install --save --save-exact react-scripts@latest",
     "tree-print": "npx tree-cli --ignore node_modules --ignore build -l 999",
     "prod": "npm run build && serve -s build"
@@ -35,8 +38,7 @@
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest",
-      "plugin:storybook/recommended"
+      "react-app/jest"
     ]
   },
   "browserslist": {
@@ -53,19 +55,8 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
-    "@chromatic-com/storybook": "^3.2.4",
-    "@storybook/addon-essentials": "^8.5.6",
-    "@storybook/addon-interactions": "^8.5.6",
-    "@storybook/addon-onboarding": "^8.5.6",
-    "@storybook/blocks": "^8.5.6",
-    "@storybook/preset-create-react-app": "^8.5.6",
-    "@storybook/react": "^8.5.6",
-    "@storybook/react-webpack5": "^8.5.6",
-    "@storybook/test": "^8.5.6",
-    "eslint-plugin-storybook": "^0.11.2",
     "prop-types": "^15.8.1",
     "react-router-dom": "^7.1.5",
-    "storybook": "^8.5.6",
     "stylelint": "^16.14.1",
     "stylelint-config-recommended": "^15.0.0",
     "stylelint-config-standard": "^37.0.0",

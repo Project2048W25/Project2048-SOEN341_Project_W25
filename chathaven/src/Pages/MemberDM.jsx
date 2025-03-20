@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import "./index.css";
 import { supabase } from "../utils/supabaseClient";
+import Picker from '@emoji-mart/react'; // use for emoji support
+import emojiData from '@emoji-mart/data'; // use for emoji support
+
 
 export const MemberDM = () => {
   const { username } = useParams(); // Friend's username from the URL
@@ -111,6 +114,32 @@ export const MemberDM = () => {
     return dateObj.toLocaleString();
   };
 
+  // Emoji picker configuration
+  const emojiButtonRef = useRef(null);
+  const [showEmojis, setShowEmojis] = useState(false);
+// Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiButtonRef.current && !emojiButtonRef.current.contains(event.target)) {
+        setShowEmojis(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  const [emojiWindowPosition, setemojiWindowPosition] = useState({ x: 0, y: 0 });
+  // Capture the mouse position when clicking the button
+  const handleEmojiButtonClick = (event) => {
+    setShowEmojis((prev) => !prev);
+
+    setemojiWindowPosition({ x: event.clientX, y: event.clientY }); // Store cursor position
+  };
+
+  // end of emoji picker configuration
+
   return (
     <div className="main-container">
       {/* DM Header */}
@@ -131,12 +160,13 @@ export const MemberDM = () => {
               </div>
               <div className="message__outer">
                 <div className="message__bubble">
-                    <div className="sender-name">
-                      {msg.user_id === currentUser?.id ? "You" : username || "Unknown"}:
-                    </div>
-                    <div className="message-content">
-                      {msg.message}
-                    </div>
+                  <div className="sender-name">
+                    {msg.user_id === currentUser?.id
+                      ? "You"
+                      : username || "Unknown"}
+                    :
+                  </div>
+                  <div className="message-content">{msg.message}</div>
                 </div>
               </div>
             </div>
@@ -145,7 +175,39 @@ export const MemberDM = () => {
       </div>
 
       {/* Message Input */}
+      {showEmojis && (
+          <div ref={emojiButtonRef}
+               style={{
+                 // position: "fixed",
+                 top: `${emojiWindowPosition.y}px`,
+                 left: `${emojiWindowPosition.x}px`,
+                 zIndex: 1000,
+               }}>
+            <Picker
+                data={emojiData} // load emoji data
+                navPosition={"bottom"}
+                onEmojiSelect={(emoji) => setInput(input + emoji.native)} // add emoji to input
+            />
+          </div>
+      )}
       <div className="chat-input-container">
+        <button
+          type={"button"}
+          className=""
+          onClick={() => setShowEmojis(!showEmojis) && handleEmojiButtonClick}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="white"
+            className="react-input-emoji--button--icon"
+          >
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0m0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10"></path>
+            <path d="M8 7a2 2 0 1 0-.001 3.999A2 2 0 0 0 8 7M16 7a2 2 0 1 0-.001 3.999A2 2 0 0 0 16 7M15.232 15c-.693 1.195-1.87 2-3.349 2-1.477 0-2.655-.805-3.347-2H15m3-2H6a6 6 0 1 0 12 0"></path>
+          </svg>
+        </button>
         <input
           type="text"
           value={input}
@@ -154,7 +216,9 @@ export const MemberDM = () => {
           placeholder="Write message"
           className="chat-input"
         />
-        <button onClick={handleSend} className="send-button">Send</button>
+        <button onClick={handleSend} className="send-button">
+          Send
+        </button>
       </div>
     </div>
   );

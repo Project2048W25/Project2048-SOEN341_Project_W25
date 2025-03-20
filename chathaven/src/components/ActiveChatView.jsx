@@ -68,6 +68,7 @@ export const ActiveChatView = () => {
 
             {/* Input & Send Button */}
             <div className="flex items-center gap-2 p-3 border-t border-[#313d4f]">
+
                 <input
                     type="text"
                     value={inputMessage}
