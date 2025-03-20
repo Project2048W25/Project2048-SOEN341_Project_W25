@@ -37,12 +37,16 @@ export const MembersList = ({ channelId }) => {
     const fetchMembers = async () => {
       const { data, error } = await supabase
         .from("channel_members")
-        .select("id, user_id, status, profiles(username)")
-        .eq("channel_id", channelId);
-      if (error) {
+        .select("id, user_id, status, profiles!inner(username, status)")
+        .eq("channel_id", channelId);     
+
+        if (error) {
         console.error("Error fetching channel_members:", error);
         return;
       }
+      console.log("Fetched members:", data);
+      setAccepted(data);
+
       const pendingList = data.filter((m) => m.status === "pending");
       const acceptedList = data.filter((m) => m.status === "accepted");
       setRequests(pendingList);
@@ -101,6 +105,83 @@ export const MembersList = ({ channelId }) => {
 
   const isCreator = currentUser && channelCreatorId && currentUser.id === channelCreatorId;
 
+  //Fetch the status
+  useEffect(() => {
+    if (!currentUser) return;
+  
+    const updateStatus = async (status) => {
+      await supabase
+        .from("profiles")
+        .update({ status })
+        .eq("id", currentUser.id);
+    };
+  
+    // Set to "online" when active
+    const handleActivity = () => {
+      updateStatus("online");
+      
+      // Reset the timer to detect inactivity again
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => updateStatus("away"), 60000); // 1 min inactivity = away
+    };
+  
+    // Set to "offline" when closing the page
+    const handleBeforeUnload = async () => {
+      await updateStatus("offline");
+    };
+  
+    let inactivityTimer = setTimeout(() => updateStatus("away"), 60000); // 1 min of inactivity
+  
+    window.addEventListener("mousemove", handleActivity);
+    window.addEventListener("keydown", handleActivity);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+  
+    return () => {
+      clearTimeout(inactivityTimer);
+      window.removeEventListener("mousemove", handleActivity);
+      window.removeEventListener("keydown", handleActivity);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [currentUser]);
+  
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "online":
+        return "status-online";
+      case "away":
+        return "status-away";
+      case "offline":
+      default:
+        return "status-offline";
+    }
+  };
+
+  //Get the live status updates of the members
+  useEffect(() => {
+    const statusSubscription = supabase
+      .channel("profiles_status")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "profiles" },
+        (payload) => {
+          setAccepted((prev) =>
+            prev.map((m) =>
+              m.user_id === payload.new.id
+                ? { ...m, profiles: { ...m.profiles, status: payload.new.status } }
+                : m
+            )
+          );
+        }
+      )
+      .subscribe();
+  
+    return () => {
+      supabase.removeChannel(statusSubscription);
+    };
+  }, []);
+  
+  
+
   return (
     <div className="members-list">
       {isCreator && requests.length > 0 && (
@@ -124,10 +205,20 @@ export const MembersList = ({ channelId }) => {
       <ul>
         {accepted.map((m) => {
           const isChannelCreator = m.user_id === channelCreatorId;
+          const userStatus = m.profiles?.status || "offline"; 
           return (
-            <li key={m.id}>
-              {m.profiles?.username || "Unknown"} {isChannelCreator && "👑"}
+            <li key={m.id} className="member-item">
+              <span className="username">
+                {m.profiles?.username || "Unknown"} {isChannelCreator && "👑"}
+              </span>
+              <div className="user-status">
+                <span className={`status-indicator ${getStatusClass(userStatus)}`}></span>
+                <span className="status-text">
+                  {userStatus.charAt(0).toUpperCase() + userStatus.slice(1)}
+                </span>
+              </div>
             </li>
+
           );
         })}
       </ul>

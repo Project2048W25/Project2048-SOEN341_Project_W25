@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import "./index.css";
 import { supabase } from "../utils/supabaseClient";
@@ -24,7 +24,7 @@ export const MemberDM = () => {
     const fetchFriendProfile = async () => {
       const { data: friendData } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, username, status")
         .eq("username", username)
         .single();
       
@@ -111,11 +111,57 @@ export const MemberDM = () => {
     return dateObj.toLocaleString();
   };
 
+  // Emoji picker configuration
+  const emojiButtonRef = useRef(null);
+  const [showEmojis, setShowEmojis] = useState(false);
+// Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiButtonRef.current && !emojiButtonRef.current.contains(event.target)) {
+        setShowEmojis(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  const [emojiWindowPosition, setemojiWindowPosition] = useState({ x: 0, y: 0 });
+  // Capture the mouse position when clicking the button
+  const handleEmojiButtonClick = (event) => {
+    setShowEmojis((prev) => !prev);
+
+    setemojiWindowPosition({ x: event.clientX, y: event.clientY }); // Store cursor position
+  };
+
+  // end of emoji picker configuration
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "online":
+        return "status-online";
+      case "away":
+        return "status-away";
+      case "offline":
+      default:
+        return "status-offline";
+    }
+  };
+
   return (
     <div className="main-container">
       {/* DM Header */}
       <div className="dm-header">
         <span className="username">{username}</span>
+        {friendProfile?.status && (
+        <div className="user-status">
+          <span className={`status-indicator ${getStatusClass(friendProfile.status)}`}></span>
+          <span className="status-text">
+            {friendProfile.status.charAt(0).toUpperCase() + friendProfile.status.slice(1)}
+          </span>
+        </div>
+      )}
       </div>
 
       {/* Chat Messages */}

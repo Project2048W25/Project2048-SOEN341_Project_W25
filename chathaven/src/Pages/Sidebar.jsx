@@ -9,6 +9,9 @@ export const Sidebar = () => {
   const [username, setUsername] = useState(null);
   const [role, setRole] = useState(null);
 
+  // User presence status
+  const [status, setStatus] = useState('online');
+
   // Teams & Channels
   const [teams, setTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
@@ -102,7 +105,7 @@ export const Sidebar = () => {
 
     const { data: acceptedFriends, error: friendsError } = await supabase
       .from("friends")
-      .select("id, sender_id, receiver_id, sender:sender_id ( id, username ), receiver:receiver_id ( id, username )")
+      .select("id, sender_id, receiver_id, sender:sender_id ( id, username, status), receiver:receiver_id ( id, username, status)") //added the status to sender & receiver
       .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
       .eq("status", "accepted")
       .order("created_at", { ascending: false });
@@ -153,6 +156,51 @@ export const Sidebar = () => {
       supabase.removeChannel(teamsSubscription);
     };
   }, [user]);
+
+  // -----------------------------
+  // Detecting online, offline, and away status
+  // -----------------------------
+  useEffect(() => {
+    const handleOnline = () => setStatus('online');
+    const handleOffline = () => setStatus('offline');
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    // Turn on away status after 1 minute of inactivity
+    let inactivityTimer;
+    const handleUserActivity = () => {
+      clearTimeout(inactivityTimer);
+      setStatus('online');
+      inactivityTimer = setTimeout(() => setStatus('away'), 60000); // 1 minute of inactivity
+    };
+
+    window.addEventListener('mousemove', handleUserActivity);
+    window.addEventListener('keydown', handleUserActivity);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('mousemove', handleUserActivity);
+      window.removeEventListener('keydown', handleUserActivity);
+      clearTimeout(inactivityTimer);
+    };
+  }, []);
+
+  // UI for Status Indicator
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'online':
+        return 'status-online';
+      case 'offline':
+        return 'status-offline';
+      case 'away':
+        return 'status-away';
+      default:
+        return '';
+    }
+  };
+
 
   // ----------------------------
   // Fetch channels and memberships for the current team
@@ -561,7 +609,15 @@ export const Sidebar = () => {
       {/* Profile Showcase */}
       <div className="sidebar-profile">
         <div className="username">{username || "User"}</div>
-        <div className="role">{role || "Member"}</div>
+        <div className="role"> {role || "Member"}</div>
+
+        {/*User Presence indicator */}
+        <div className = "user-status">
+        <span className={`status-indicator ${getStatusClass(status)}`}></span>
+        <span className="status-text">
+          {status.charAt(0).toUpperCase() + status.slice(1)}
+        </span>
+        </div>
       </div>
 
       {/* Direct Messages */}
@@ -577,7 +633,8 @@ export const Sidebar = () => {
                 className="dm-item"
                 onClick={() => navigate(`/dm/${friendProfile.username}`)}
               >
-                {friendProfile?.username}
+                <span className={`status-indicator ${getStatusClass(friendProfile.status)}`}></span>
+                <span className="dm-username">{friendProfile?.username}</span>
               </li>
             );
           })}
