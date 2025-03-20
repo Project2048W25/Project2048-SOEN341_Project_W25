@@ -27,7 +27,7 @@ export const MemberDM = () => {
     const fetchFriendProfile = async () => {
       const { data: friendData } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, username, status")
         .eq("username", username)
         .single();
       
@@ -140,11 +140,31 @@ export const MemberDM = () => {
 
   // end of emoji picker configuration
 
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "online":
+        return "status-online";
+      case "away":
+        return "status-away";
+      case "offline":
+      default:
+        return "status-offline";
+    }
+  };
+
   return (
     <div className="main-container">
       {/* DM Header */}
       <div className="dm-header">
         <span className="username">{username}</span>
+        {friendProfile?.status && (
+        <div className="user-status">
+          <span className={`status-indicator ${getStatusClass(friendProfile.status)}`}></span>
+          <span className="status-text">
+            {friendProfile.status.charAt(0).toUpperCase() + friendProfile.status.slice(1)}
+          </span>
+        </div>
+      )}
       </div>
 
       {/* Chat Messages */}

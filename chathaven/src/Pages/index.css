@@ -517,3 +517,65 @@ html, body {
   background-color: #393c43;
 }
 
+/* Status Indicator */
+.status-indicator{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.status-online{
+  background-color:green;
+}
+
+.status-away{
+  background-color: red;
+}
+
+.status-offline{
+  background-color:yellow;
+}
+
+.dm-list .status-indicator{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.dm-item .status-online {
+  background-color: green;
+}
+
+.dm-item .status-offline {
+  background-color: yellow;
+}
+
+.dm-item .status-away {
+  background-color: red;
+}
+
+.user-status {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.status-text {
+  font-weight: normal;
+  color: #dcddde; /* Adjust based on theme */
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
