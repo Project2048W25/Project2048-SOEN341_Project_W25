@@ -21,6 +21,21 @@ html, body {
 }
 
 /* Sidebar Styling */
+/*.sidebar {*/
+/*  width: 280px;*/
+/*  background-color: #2a2433;*/
+/*  color: #dcddde;*/
+/*  display: flex;*/
+/*  flex-direction: column;*/
+/*  padding: 20px;*/
+/*  border-right: 1px solid #1f1a25;*/
+/*  position: fixed;*/
+/*  top: 0;*/
+/*  left: 0;*/
+/*  height: 100vh;*/
+/*  overflow-y: auto;*/
+/*  font-family: 'Inter', sans-serif;*/
+/*}*/
 .sidebar {
   width: 280px;
   background-color: #2a2433;
@@ -29,12 +44,28 @@ html, body {
   flex-direction: column;
   padding: 20px;
   border-right: 1px solid #1f1a25;
-  position: fixed;
-  top: 0;
-  left: 0;
   height: 100vh;
   overflow-y: auto;
-  font-family: 'Inter', sans-serif;
+  transition: width 0.3s ease-in-out;  /*transation when windows is resized*/
+}
+/* sidebar Medium Screens (Tablets) */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 200px; /* Shrink the sidebar */
+  }
+}
+
+/* sidebar Small Screens (Mobile) */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 80px; /* Minimal sidebar size */
+    padding: 10px; /* Reduce padding */
+  }
+
+  /* Hide text but keep icons visible */
+  .sidebar span {
+    display: none;
+  }
 }
 
 /* Profile Showcase at Top */
@@ -143,22 +174,53 @@ html, body {
 
 /* Main Content */
 .main-content {
-  margin-left: 280px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   background-color: #1f1c2c;
+  min-height: 100vh; /* Ensure full height */
+
+  /*responsiveness*/
+  @media (max-width: 1024px) {
+    /*margin-left: 220px; !* Adjust margin for smaller screens *!*/
+  }
+  /*extra responsiveness*/
+  @media (max-width: 768px) {
+    margin-left: 0; /* Full width when sidebar is hidden/collapsible */
+  }
 }
 
 /* View Containers */
+/*.view-container {*/
+/*  text-align: center;*/
+/*  padding: 20px;*/
+/*  max-width: 800px;*/
+/*  width: 100%;*/
+/*  margin: auto auto auto 280px; !* Adjust margin for sidebar *!*/
+/*}*/
+/*@media (max-width: 1024px) {*/
+/*  .view-container {*/
+/*    margin-left: 0; !* Reset margin for small screens *!*/
+/*  }*/
+/*}*/
+
 .view-container {
+  flex: 1; /* Takes remaining space */
   margin: auto;
   text-align: center;
   padding: 20px;
   max-width: 800px;
   width: 100%;
 }
+
+/* Responsive: Hide Sidebar on Small Screens */
+@media (max-width: 1024px) {
+  .view-container {
+    margin-left: 0; /* Reset margin */
+  }
+}
+
 .view-container h1 {
   font-size: 28px;
   font-weight: bold;

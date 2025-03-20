@@ -1,7 +1,5 @@
 import React from "react";
 import { Button } from "../components/Button";
-import { TextField } from "../components/TextField";
-import {signup} from '../Pages/Signup'
 import line3 from "../icons/line-3.svg";
 import slice1 from "../icons/slice-1.svg";
 import '../styles/tailwind.CSS/tailwind.css'

@@ -7,7 +7,8 @@ export const AdminView = () => {
   }, []);
 
   return (
-    <div className="main-container" style={{ alignItems: "center", justifyContent: "center" }}>
+    <div className=" main-container flex items-center justify-center"
+    >
       <div className="view-container">
         <h1>Admin Dashboard</h1>
         <p>You are an Admin. Manage Teams/Channels via the Sidebar.</p>
