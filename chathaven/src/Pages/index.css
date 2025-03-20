@@ -579,9 +579,3 @@ html, body {
   border-radius: 4px;
   transition: background-color 0.2s;
 }
-
-.user-status {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-}
