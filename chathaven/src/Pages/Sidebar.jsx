@@ -600,8 +600,22 @@ export const Sidebar = () => {
   // Logout
   // ----------------------------
   const handleLogout = async () => {
+
+    const { data, error } = await supabase.auth.getSession();
+
+    if (!data || error) {
+      navigate("/login");
+      return;
+    }
+
+    await supabase
+      .from("profiles")
+      .update({ status: "offline", last_seen: new Date().toISOString() })
+      .eq("id", data.session.user.id);
+
     await supabase.auth.signOut();
     navigate("/login");
+    return;
   };
 
   return (

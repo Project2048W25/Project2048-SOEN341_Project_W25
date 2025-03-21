@@ -114,6 +114,13 @@ export const MembersList = ({ channelId }) => {
         .from("profiles")
         .update({ status })
         .eq("id", currentUser.id);
+
+      if (status === "offline") {
+        await supabase
+          .from("profiles")
+          .update({ last_seen: new Date().toISOString() })
+          .eq("id", currentUser.id);
+      }
     };
   
     // Set to "online" when active
