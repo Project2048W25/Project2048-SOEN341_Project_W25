@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
 import { createPortal } from "react-dom";
+import Picker from "@emoji-mart/react";
+import emojiData from "@emoji-mart/data";
 import "./index.css";
 
 export const ChannelDM = () => {
@@ -10,18 +12,37 @@ export const ChannelDM = () => {
   const [channelName, setChannelName] = useState("Loading...");
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [replyMessage, setReplyMessage] = useState(null); // state for reply
 
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [teamOwnerId, setTeamOwnerId] = useState(null);
 
-  // State for Context Menu
+  // Context Menu state
   const [contextMenu, setContextMenu] = useState({
     visible: false,
     x: 0,
     y: 0,
     message: null,
   });
+
+  // States and ref for the emoji picker
+  const emojiButtonRef = useRef(null);
+  const [showEmojis, setShowEmojis] = useState(false);
+  const [emojiWindowPosition, setEmojiWindowPosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    // Click outside to close emoji picker
+    const handleClickOutside = (event) => {
+      if (emojiButtonRef.current && !emojiButtonRef.current.contains(event.target)) {
+        setShowEmojis(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     // Fetch user & role
@@ -121,11 +142,31 @@ export const ChannelDM = () => {
 
   const handleSend = async () => {
     if (!input.trim() || !user) return;
+    let finalMessage = input;
+    // If replying, extract only the plain text from the original reply (if it is one)
+    if (replyMessage) {
+      let originalMessage = replyMessage.message;
+      try {
+        // If replyMessage.message is a JSON string from a previous reply, extract the plain text
+        const parsedReply = JSON.parse(replyMessage.message);
+        if (parsedReply && parsedReply.reply && parsedReply.message) {
+          originalMessage = parsedReply.message;
+        }
+      } catch (e) {
+        // Not a reply (not JSON), so use the original message
+      }
+      const replyData = {
+        message: originalMessage,
+        sender: replyMessage.user_id === user?.id ? "You" : replyMessage.profiles?.username || "Unknown",
+        senderId: replyMessage.user_id,
+      };
+      finalMessage = JSON.stringify({ reply: replyData, message: input });
+    }
     const { data, error } = await supabase
       .from("messages")
       .insert([
         {
-          message: input,
+          message: finalMessage,
           channel_id: channelId,
           user_id: user.id,
         },
@@ -139,8 +180,10 @@ export const ChannelDM = () => {
         return [...prev, data[0]];
       });
       setInput("");
+      setReplyMessage(null); // clear reply after sending
     }
   };
+  
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -149,8 +192,14 @@ export const ChannelDM = () => {
     }
   };
 
-  // Context Menu Component
-  const ContextMenu = ({ x, y, message, onClose }) => {
+  // Handler to toggle emoji picker
+  const handleEmojiButtonClick = (event) => {
+    setShowEmojis((prev) => !prev);
+    setEmojiWindowPosition({ x: event.clientX, y: event.clientY });
+  };
+
+  // Extended Context Menu with Reply option
+  const ContextMenu = ({ x, y, message, onClose, onReply }) => {
     const handleCopy = () => {
       navigator.clipboard.writeText(message.message);
       onClose();
@@ -174,6 +223,11 @@ export const ChannelDM = () => {
       onClose();
     };
 
+    const handleReply = () => {
+      onReply(message);
+      onClose();
+    };
+
     return createPortal(
       <div
         onMouseLeave={onClose}
@@ -194,6 +248,12 @@ export const ChannelDM = () => {
             Delete message
           </button>
         )}
+        <button
+          onClick={handleReply}
+          className="w-full flex items-center px-3 py-2 text-gray-300 hover:bg-gray-700 rounded-md transition"
+        >
+          Reply
+        </button>
       </div>,
       document.body
     );
@@ -205,30 +265,123 @@ export const ChannelDM = () => {
         <span className="username">#{channelName}</span>
       </div>
       <div className="chat-messages">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`message ${msg.user_id === user?.id ? "outgoing" : "incoming"}`}
-            onContextMenu={(e) => {
-              e.preventDefault();
-              setContextMenu({ visible: true, x: e.clientX, y: e.clientY, message: msg });
-            }}
-          >
-            <div className="message-bundle">
-              <div className="message-timestamp">{new Date(msg.created_at).toLocaleString()}</div>
-              <div className="message__outer">
-                <div className="message__bubble">
-                  <div className="sender-name">
-                    {msg.user_id === user?.id ? "You" : msg.profiles?.username || "Unknown"}
+        {messages.map((msg) => {
+          // Attempt to parse the message as a reply structure
+          let messageText = msg.message;
+          let replyData = null;
+          try {
+            const parsed = JSON.parse(msg.message);
+            if (parsed && parsed.reply && parsed.message) {
+              replyData = parsed.reply;
+              messageText = parsed.message;
+            }
+          } catch (e) {
+            // Not a JSON structure, so render as plain text.
+          }
+          // Determine if this message should be highlighted (only for the user being replied to)
+          const highlight = replyData && user && replyData.senderId === user.id;
+          return (
+            <div
+              key={msg.id}
+              className={`message ${
+                msg.user_id === user?.id ? "outgoing" : "incoming"
+              } ${highlight ? "highlighted" : ""}`}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                setContextMenu({
+                  visible: true,
+                  x: e.clientX,
+                  y: e.clientY,
+                  message: msg,
+                });
+              }}
+            >
+              <div className="message-bundle">
+                <div className="message-timestamp">
+                  {new Date(msg.created_at).toLocaleString()}
+                </div>
+                <div className="message__outer">
+                  <div className="message__bubble">
+                    <div className="sender-name">
+                      {msg.user_id === user?.id ? "You" : msg.profiles?.username || "Unknown"}
+                    </div>
+                    {/* Render replied message box if reply metadata is available */}
+                    {replyData && (
+                      <div className="replied-message">
+                        <div className="replied-message-header">
+                          <b>Replying to @{replyData.sender}:</b>
+                        </div>
+                        <div className="replied-message-content">
+                          "{replyData.message}"
+                        </div>
+                      </div>
+                    )}
+                    <div className="message-content">{messageText}</div>
                   </div>
-                  <div className="message-content">{msg.message}</div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+      {/* Reply preview above chat input */}
+      {replyMessage && (
+        <div className="reply-preview">
+          <div>
+            <b>
+              Replying to @{replyMessage.user_id === user?.id ? "You" : replyMessage.profiles?.username || "Unknown"}:
+            </b>{" "}
+            "
+            {(() => {
+              let previewMsg = replyMessage.message;
+              try {
+                const parsedReply = JSON.parse(replyMessage.message);
+                if (parsedReply && parsedReply.reply && parsedReply.message) {
+                  previewMsg = parsedReply.message;
+                }
+              } catch (e) {
+                // Not a nested reply
+              }
+              return previewMsg;
+            })()}
+            "
+          </div>
+          <button className="cancel-reply" onClick={() => setReplyMessage(null)}>
+            X
+          </button>
+        </div>
+      )}
+      {/* Emoji Picker */}
+      {showEmojis && (
+        <div
+          ref={emojiButtonRef}
+          style={{
+            top: `${emojiWindowPosition.y}px`,
+            left: `${emojiWindowPosition.x}px`,
+            zIndex: 1000,
+          }}
+        >
+          <Picker
+            data={emojiData}
+            navPosition={"bottom"}
+            onEmojiSelect={(emoji) => setInput(input + emoji.native)}
+          />
+        </div>
+      )}
       <div className="chat-input-container">
+        <button type="button" onClick={handleEmojiButtonClick} className="emoji-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="28"
+            height="28"
+            fill="white"
+            className="react-input-emoji--button--icon"
+          >
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0" />
+            <path d="M8 7a2 2 0 1 0-.001 3.999A2 2 0 0 0 8 7M16 7a2 2 0 1 0-.001 3.999A2 2 0 0 0 16 7M15.232 15c-.693 1.195-1.87 2-3.349 2-1.477 0-2.655-.805-3.347-2H15m3-2H6a6 6 0 1 0 12 0" />
+          </svg>
+        </button>
         <input
           type="text"
           value={input}
@@ -246,7 +399,10 @@ export const ChannelDM = () => {
           x={contextMenu.x}
           y={contextMenu.y}
           message={contextMenu.message}
-          onClose={() => setContextMenu({ ...contextMenu, visible: false, message: null })}
+          onClose={() =>
+            setContextMenu({ ...contextMenu, visible: false, message: null })
+          }
+          onReply={(msg) => setReplyMessage(msg)}
         />
       )}
     </div>
