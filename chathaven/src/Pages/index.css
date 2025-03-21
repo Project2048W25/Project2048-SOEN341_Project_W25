@@ -579,3 +579,71 @@ html, body {
   border-radius: 4px;
   transition: background-color 0.2s;
 }
+
+/* Reply preview styling for chat input */
+.reply-preview {
+  position: relative;
+  border-left: 4px solid #5865f2;
+  background-color: #2f3136;
+  color: #dcddde;
+  padding: 8px 30px 8px 8px;  /* extra right padding for cancel button */
+  margin: 10px 20px;
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
+.reply-preview .cancel-reply {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: transparent;
+  border: none;
+  color: #dcddde;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Styling for the replied message inside a message bubble */
+.replied-message {
+  border-left: 3px solid #5865f2;
+  background-color: #2f3136;
+  padding: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.replied-message-header {
+  margin-bottom: 4px;
+}
+
+.replied-message-content {
+  font-style: italic;
+}
+
+/* Highlighting for messages that tag you (only visible for the user being replied to) */
+.message.highlighted {
+  background-color: #2a2a2a; /* lighter background to indicate you were mentioned */
+  border-radius: 4px;
+  /* Optionally add some padding/margin adjustments if needed */
+}
+
+.emoji-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+/* The first path in the SVG is the big circle; set it to the background color or transparent */
+.emoji-button svg path:first-of-type {
+  fill: #dcddde; /* or 'none' if you want it completely invisible */
+}
+
+/* The second path is the "face" inside the circle; make it white, or your preferred icon color */
+.emoji-button svg path:last-of-type {
+  fill: #2f3136;
+}
+
