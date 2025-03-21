@@ -143,10 +143,20 @@ export const ChannelDM = () => {
   const handleSend = async () => {
     if (!input.trim() || !user) return;
     let finalMessage = input;
-    // If replying, include reply metadata with senderId.
+    // If replying, extract only the plain text from the original reply (if it is one)
     if (replyMessage) {
+      let originalMessage = replyMessage.message;
+      try {
+        // If replyMessage.message is a JSON string from a previous reply, extract the plain text
+        const parsedReply = JSON.parse(replyMessage.message);
+        if (parsedReply && parsedReply.reply && parsedReply.message) {
+          originalMessage = parsedReply.message;
+        }
+      } catch (e) {
+        // Not a reply (not JSON), so use the original message
+      }
       const replyData = {
-        message: replyMessage.message,
+        message: originalMessage,
         sender: replyMessage.user_id === user?.id ? "You" : replyMessage.profiles?.username || "Unknown",
         senderId: replyMessage.user_id,
       };
@@ -173,6 +183,7 @@ export const ChannelDM = () => {
       setReplyMessage(null); // clear reply after sending
     }
   };
+  
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -320,7 +331,20 @@ export const ChannelDM = () => {
             <b>
               Replying to @{replyMessage.user_id === user?.id ? "You" : replyMessage.profiles?.username || "Unknown"}:
             </b>{" "}
-            "{replyMessage.message}"
+            "
+            {(() => {
+              let previewMsg = replyMessage.message;
+              try {
+                const parsedReply = JSON.parse(replyMessage.message);
+                if (parsedReply && parsedReply.reply && parsedReply.message) {
+                  previewMsg = parsedReply.message;
+                }
+              } catch (e) {
+                // Not a nested reply
+              }
+              return previewMsg;
+            })()}
+            "
           </div>
           <button className="cancel-reply" onClick={() => setReplyMessage(null)}>
             X

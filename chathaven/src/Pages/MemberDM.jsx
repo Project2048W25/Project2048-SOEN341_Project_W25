@@ -22,11 +22,14 @@ export const MemberDM = () => {
     message: null,
   });
 
+  // Emoji picker state and ref
+  const emojiButtonRef = useRef(null);
+  const [showEmojis, setShowEmojis] = useState(false);
+  const [emojiWindowPosition, setEmojiWindowPosition] = useState({ x: 0, y: 0 });
+
   useEffect(() => {
     const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setCurrentUser(user);
       }
@@ -93,14 +96,41 @@ export const MemberDM = () => {
     };
   }, [currentUser, friendProfile]);
 
+  useEffect(() => {
+    // Click outside to close the emoji picker
+    const handleClickOutside = (event) => {
+      if (emojiButtonRef.current && !emojiButtonRef.current.contains(event.target)) {
+        setShowEmojis(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleEmojiButtonClick = (event) => {
+    setShowEmojis((prev) => !prev);
+    setEmojiWindowPosition({ x: event.clientX, y: event.clientY });
+  };
+
   const handleSend = async () => {
     if (input.trim() && currentUser && friendProfile) {
       let finalMessage = input;
-      // If replying, include reply metadata with senderId.
+      // If replying, unwrap any nested reply JSON so that we quote only the plain text.
       if (replyMessage) {
+        let originalMessage = replyMessage.message;
+        try {
+          const parsedReply = JSON.parse(replyMessage.message);
+          if (parsedReply && parsedReply.reply && parsedReply.message) {
+            originalMessage = parsedReply.message;
+          }
+        } catch (e) {
+          // Not a nested reply; keep originalMessage as is.
+        }
         const replyData = {
-          message: replyMessage.message,
-          sender: replyMessage.user_id === currentUser?.id ? "You" : replyMessage.profiles?.username || "Unknown",
+          message: originalMessage,
+          sender: replyMessage.user_id === currentUser.id ? "You" : friendProfile.username || "Unknown",
           senderId: replyMessage.user_id,
         };
         finalMessage = JSON.stringify({ reply: replyData, message: input });
@@ -116,7 +146,7 @@ export const MemberDM = () => {
         console.error("Error sending message:", error);
       }
       setInput("");
-      setReplyMessage(null); // clear reply after sending
+      setReplyMessage(null); // Clear reply after sending
     }
   };
 
@@ -132,28 +162,6 @@ export const MemberDM = () => {
     return dateObj.toLocaleString();
   };
 
-  const emojiButtonRef = useRef(null);
-  const [showEmojis, setShowEmojis] = useState(false);
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        emojiButtonRef.current &&
-        !emojiButtonRef.current.contains(event.target)
-      ) {
-        setShowEmojis(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-  const [emojiWindowPosition, setemojiWindowPosition] = useState({ x: 0, y: 0 });
-  const handleEmojiButtonClick = (event) => {
-    setShowEmojis((prev) => !prev);
-    setemojiWindowPosition({ x: event.clientX, y: event.clientY });
-  };
-
   const getStatusClass = (status) => {
     switch (status) {
       case "online":
@@ -166,7 +174,7 @@ export const MemberDM = () => {
     }
   };
 
-  // Extended Context Menu with Reply option for DMs
+  // Extended Context Menu with Reply option
   const ContextMenu = ({ x, y, message, onClose, onReply }) => {
     const handleCopy = () => {
       navigator.clipboard.writeText(message.message);
@@ -251,17 +259,14 @@ export const MemberDM = () => {
               messageText = parsed.message;
             }
           } catch (e) {
-            // Not a JSON structure
+            // Not a JSON structure, so display as plain text.
           }
-          // Determine if this message should be highlighted for the current user
-          const highlight =
-            replyData && currentUser && replyData.senderId === currentUser.id;
+          // Highlight if this is a reply targeting the current user.
+          const highlight = replyData && currentUser && replyData.senderId === currentUser.id;
           return (
             <div
               key={msg.id}
-              className={`message ${
-                msg.user_id === currentUser?.id ? "outgoing" : "incoming"
-              } ${highlight ? "highlighted" : ""}`}
+              className={`message ${msg.user_id === currentUser?.id ? "outgoing" : "incoming"} ${highlight ? "highlighted" : ""}`}
               onContextMenu={(e) => {
                 e.preventDefault();
                 const menuWidth = 203;
@@ -278,9 +283,7 @@ export const MemberDM = () => {
               }}
             >
               <div className="message-bundle">
-                <div className="message-timestamp">
-                  {formatTimestamp(msg.created_at)}
-                </div>
+                <div className="message-timestamp">{formatTimestamp(msg.created_at)}</div>
                 <div className="message__outer">
                   <div className="message__bubble">
                     <div className="sender-name">
@@ -291,9 +294,7 @@ export const MemberDM = () => {
                         <div className="replied-message-header">
                           <b>Replying to @{replyData.sender}:</b>
                         </div>
-                        <div className="replied-message-content">
-                          "{replyData.message}"
-                        </div>
+                        <div className="replied-message-content">"{replyData.message}"</div>
                       </div>
                     )}
                     <div className="message-content">{messageText}</div>
@@ -304,11 +305,27 @@ export const MemberDM = () => {
           );
         })}
       </div>
-      {/* Reply preview */}
+      {/* Reply preview above the chat input */}
       {replyMessage && (
         <div className="reply-preview">
           <div>
-            <b>Replying to @{replyMessage.user_id === currentUser?.id ? "You" : replyMessage.profiles?.username || "Unknown"}:</b> "{replyMessage.message}"
+            <b>
+              Replying to @{replyMessage.user_id === currentUser?.id ? "You" : friendProfile.username || "Unknown"}:
+            </b>{" "}
+            "
+            {(() => {
+              let previewMsg = replyMessage.message;
+              try {
+                const parsedReply = JSON.parse(replyMessage.message);
+                if (parsedReply && parsedReply.reply && parsedReply.message) {
+                  previewMsg = parsedReply.message;
+                }
+              } catch (e) {
+                // Not a nested reply.
+              }
+              return previewMsg;
+            })()}
+            "
           </div>
           <button className="cancel-reply" onClick={() => setReplyMessage(null)}>
             X
@@ -362,9 +379,7 @@ export const MemberDM = () => {
           x={contextMenu.x}
           y={contextMenu.y}
           message={contextMenu.message}
-          onClose={() =>
-            setContextMenu({ ...contextMenu, visible: false, message: null })
-          }
+          onClose={() => setContextMenu({ ...contextMenu, visible: false, message: null })}
           onReply={(msg) => setReplyMessage(msg)}
         />
       )}
