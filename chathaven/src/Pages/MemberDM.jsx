@@ -6,11 +6,42 @@ import { supabase } from "../utils/supabaseClient";
 import Picker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
 
+/**
+ * Parses a message string. If the message contains a reply JSON structure,
+ * returns an object with the plain text and reply data.
+ * Otherwise returns the original message as text with no reply data.
+ */
+function parseChatMessage(message) {
+  try {
+    const parsed = JSON.parse(message);
+    if (parsed && parsed.reply && parsed.message) {
+      return { text: parsed.message, replyData: parsed.reply };
+    }
+  } catch (e) {
+    // Not JSON or no reply structure; do nothing.
+  }
+  return { text: message, replyData: null };
+}
+
+/**
+ * Builds a reply message JSON string by extracting the original message
+ * from the given replyMessage and combining it with the new input.
+ */
+function buildReplyMessage(replyMessage, newInput, currentUser, friendProfile) {
+  const { text: originalMessage } = parseChatMessage(replyMessage.message);
+  const replyData = {
+    message: originalMessage,
+    sender: replyMessage.user_id === currentUser.id ? "You" : friendProfile.username || "Unknown",
+    senderId: replyMessage.user_id,
+  };
+  return JSON.stringify({ reply: replyData, message: newInput });
+}
+
 export const MemberDM = () => {
   const { username } = useParams();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [replyMessage, setReplyMessage] = useState(null); // For quoting/reply feature
+  const [replyMessage, setReplyMessage] = useState(null);
   const [friendProfile, setFriendProfile] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -31,14 +62,12 @@ export const MemberDM = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setCurrentUser(user);
-      }
+      if (user) setCurrentUser(user);
     };
     fetchUser();
   }, []);
 
-  // Fetch friend profile with last_seen field
+  // Fetch friend profile (including last_seen)
   useEffect(() => {
     const fetchFriendProfile = async () => {
       const { data: friendData } = await supabase
@@ -48,16 +77,12 @@ export const MemberDM = () => {
         .single();
       setFriendProfile(friendData);
     };
-
-    if (username) {
-      fetchFriendProfile();
-    }
+    if (username) fetchFriendProfile();
   }, [username]);
 
   // Fetch messages and subscribe to new ones
   useEffect(() => {
     if (!currentUser || !friendProfile) return;
-
     const fetchMessages = async () => {
       const { data: dms } = await supabase
         .from("dms")
@@ -68,9 +93,7 @@ export const MemberDM = () => {
         .order("created_at", { ascending: true });
       setMessages(dms || []);
     };
-
     fetchMessages();
-
     const subscription = supabase
       .channel("dms")
       .on(
@@ -93,7 +116,6 @@ export const MemberDM = () => {
         }
       )
       .subscribe();
-
     return () => {
       supabase.removeChannel(subscription);
     };
@@ -107,9 +129,7 @@ export const MemberDM = () => {
         .from("dms")
         .update({ seen: true })
         .match({ recipient_id: currentUser.id, user_id: friendProfile.id, seen: false });
-      if (error) {
-        console.error("Error marking messages as seen:", error);
-      }
+      if (error) console.error("Error marking messages as seen:", error);
     };
     markMessagesAsSeen();
   }, [currentUser, friendProfile]);
@@ -122,9 +142,7 @@ export const MemberDM = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Toggle emoji picker and store click position
@@ -138,32 +156,15 @@ export const MemberDM = () => {
     if (input.trim() && currentUser && friendProfile) {
       let finalMessage = input;
       if (replyMessage) {
-        let originalMessage = replyMessage.message;
-        try {
-          const parsedReply = JSON.parse(replyMessage.message);
-          if (parsedReply && parsedReply.reply && parsedReply.message) {
-            originalMessage = parsedReply.message;
-          }
-        } catch (e) {
-          // Not a nested reply; keep originalMessage as is.
-        }
-        const replyData = {
-          message: originalMessage,
-          sender: replyMessage.user_id === currentUser.id ? "You" : friendProfile.username || "Unknown",
-          senderId: replyMessage.user_id,
-        };
-        finalMessage = JSON.stringify({ reply: replyData, message: input });
+        finalMessage = buildReplyMessage(replyMessage, input, currentUser, friendProfile);
       }
       const newMessage = {
         message: finalMessage,
         user_id: currentUser.id,
         recipient_id: friendProfile.id,
       };
-
       const { error } = await supabase.from("dms").insert(newMessage);
-      if (error) {
-        console.error("Error sending message:", error);
-      }
+      if (error) console.error("Error sending message:", error);
       setInput("");
       setReplyMessage(null);
     }
@@ -178,8 +179,7 @@ export const MemberDM = () => {
 
   // Format timestamp for display
   const formatTimestamp = (timestamp) => {
-    const dateObj = new Date(timestamp);
-    return dateObj.toLocaleString();
+    return new Date(timestamp).toLocaleString();
   };
 
   // Determine status class for friend
@@ -201,7 +201,6 @@ export const MemberDM = () => {
       navigator.clipboard.writeText(message.message);
       onClose();
     };
-
     const handleDelete = () => {
       const confirmDelete = window.confirm("Delete this message?");
       if (confirmDelete) {
@@ -219,12 +218,10 @@ export const MemberDM = () => {
       }
       onClose();
     };
-
     const handleReply = () => {
       onReply(message);
       onClose();
     };
-
     return createPortal(
       <div
         onMouseLeave={onClose}
@@ -279,17 +276,7 @@ export const MemberDM = () => {
       {/* Chat Messages */}
       <div className="chat-messages">
         {messages.map((msg) => {
-          let messageText = msg.message;
-          let replyData = null;
-          try {
-            const parsed = JSON.parse(msg.message);
-            if (parsed && parsed.reply && parsed.message) {
-              replyData = parsed.reply;
-              messageText = parsed.message;
-            }
-          } catch (e) {
-            // Not a JSON structure; display plain text.
-          }
+          const { text: messageText, replyData } = parseChatMessage(msg.message);
           const highlight = replyData && currentUser && replyData.senderId === currentUser.id;
           return (
             <div
@@ -299,15 +286,8 @@ export const MemberDM = () => {
                 e.preventDefault();
                 const menuWidth = 203;
                 let x = e.clientX;
-                if (x + menuWidth > window.innerWidth) {
-                  x = e.clientX - menuWidth;
-                }
-                setContextMenu({
-                  visible: true,
-                  x,
-                  y: e.clientY,
-                  message: msg,
-                });
+                if (x + menuWidth > window.innerWidth) x = e.clientX - menuWidth;
+                setContextMenu({ visible: true, x, y: e.clientY, message: msg });
               }}
             >
               <div className="message-bundle">
@@ -347,19 +327,7 @@ export const MemberDM = () => {
               Replying to @{replyMessage.user_id === currentUser?.id ? "You" : friendProfile.username || "Unknown"}:
             </b>{" "}
             "
-            {(() => {
-              let previewMsg = replyMessage.message;
-              try {
-                const parsedReply = JSON.parse(replyMessage.message);
-                if (parsedReply && parsedReply.reply && parsedReply.message) {
-                  previewMsg = parsedReply.message;
-                }
-              } catch (e) {
-                // Not a nested reply.
-              }
-              return previewMsg;
-            })()}
-            "
+            {parseChatMessage(replyMessage.message).text}"
           </div>
           <button className="cancel-reply" onClick={() => setReplyMessage(null)}>
             X
@@ -371,31 +339,16 @@ export const MemberDM = () => {
       {showEmojis && (
         <div
           ref={emojiButtonRef}
-          style={{
-            top: `${emojiWindowPosition.y}px`,
-            left: `${emojiWindowPosition.x}px`,
-            zIndex: 1000,
-          }}
+          style={{ top: `${emojiWindowPosition.y}px`, left: `${emojiWindowPosition.x}px`, zIndex: 1000 }}
         >
-          <Picker
-            data={emojiData}
-            navPosition={"bottom"}
-            onEmojiSelect={(emoji) => setInput(input + emoji.native)}
-          />
+          <Picker data={emojiData} navPosition={"bottom"} onEmojiSelect={(emoji) => setInput(input + emoji.native)} />
         </div>
       )}
 
       {/* Message Input */}
       <div className="chat-input-container">
         <button type="button" onClick={handleEmojiButtonClick} className="emoji-button">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="28"
-            height="28"
-            fill="white"
-            className="react-input-emoji--button--icon"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="white" className="react-input-emoji--button--icon">
             <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0" />
             <path d="M8 7a2 2 0 1 0-.001 3.999A2 2 0 0 0 8 7M16 7a2 2 0 1 0-.001 3.999A2 2 0 0 0 16 7M15.232 15c-.693 1.195-1.87 2-3.349 2-1.477 0-2.655-.805-3.347-2H15m3-2H6a6 6 0 1 0 12 0" />
           </svg>
