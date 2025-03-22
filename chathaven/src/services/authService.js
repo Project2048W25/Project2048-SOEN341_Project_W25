@@ -3,6 +3,12 @@ import { supabase } from '../utils/supabaseClient';
 // Sign in with email and password
 export async function signInWithEmail(email, password) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+  await supabase
+    .from("profiles")
+    .update({ status: "online", last_seen: null })
+    .eq("id", data.user.id);
+
   return { data, error };
 }
 

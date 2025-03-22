@@ -28,7 +28,7 @@ export const MemberDM = () => {
     const fetchFriendProfile = async () => {
       const { data: friendData } = await supabase
         .from("profiles")
-        .select("id, username, status")
+        .select("id, username, status, last_seen")
         .eq("username", username)
         .single();
       setFriendProfile(friendData);
@@ -170,6 +170,18 @@ export const MemberDM = () => {
             </span>
           </div>
         )}
+        <div className="user-status">
+          <span className={`status-indicator ${getStatusClass(friendProfile.status)}`}></span>
+          <span className="status-text">
+            {friendProfile.status.charAt(0).toUpperCase() + friendProfile.status.slice(1)}
+          </span>
+          {friendProfile.status === "offline" && friendProfile.last_seen && (
+            <span className="last-seen" style={{ marginLeft: "8px"  }}>
+              - Last Seen: {formatTimestamp(friendProfile.last_seen)}
+            </span>
+          )}
+        </div>
+      )}
       </div>
 
       {/* Chat Messages */}
