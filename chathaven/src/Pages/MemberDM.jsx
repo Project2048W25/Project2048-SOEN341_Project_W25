@@ -10,7 +10,7 @@ export const MemberDM = () => {
   const { username } = useParams();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [replyMessage, setReplyMessage] = useState(null); // state for reply feature
+  const [replyMessage, setReplyMessage] = useState(null); // For quoting/reply feature
   const [friendProfile, setFriendProfile] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -38,7 +38,7 @@ export const MemberDM = () => {
     fetchUser();
   }, []);
 
-  // Fetch friend profile with last_seen added
+  // Fetch friend profile with last_seen field
   useEffect(() => {
     const fetchFriendProfile = async () => {
       const { data: friendData } = await supabase
@@ -99,6 +99,21 @@ export const MemberDM = () => {
     };
   }, [currentUser, friendProfile]);
 
+  // Mark incoming messages as seen when conversation opens
+  useEffect(() => {
+    if (!currentUser || !friendProfile) return;
+    const markMessagesAsSeen = async () => {
+      const { error } = await supabase
+        .from("dms")
+        .update({ seen: true })
+        .match({ recipient_id: currentUser.id, user_id: friendProfile.id, seen: false });
+      if (error) {
+        console.error("Error marking messages as seen:", error);
+      }
+    };
+    markMessagesAsSeen();
+  }, [currentUser, friendProfile]);
+
   // Close emoji picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -118,7 +133,7 @@ export const MemberDM = () => {
     setEmojiWindowPosition({ x: event.clientX, y: event.clientY });
   };
 
-  // Send message with reply wrapping if needed
+  // Send message (with reply wrapping if applicable)
   const handleSend = async () => {
     if (input.trim() && currentUser && friendProfile) {
       let finalMessage = input;
@@ -150,7 +165,7 @@ export const MemberDM = () => {
         console.error("Error sending message:", error);
       }
       setInput("");
-      setReplyMessage(null); // Clear reply after sending
+      setReplyMessage(null);
     }
   };
 
@@ -167,7 +182,7 @@ export const MemberDM = () => {
     return dateObj.toLocaleString();
   };
 
-  // Determine status indicator class
+  // Determine status class for friend
   const getStatusClass = (status) => {
     switch (status) {
       case "online":
@@ -180,7 +195,7 @@ export const MemberDM = () => {
     }
   };
 
-  // Extended Context Menu with Reply option
+  // Extended Context Menu with reply, copy, and delete options
   const ContextMenu = ({ x, y, message, onClose, onReply }) => {
     const handleCopy = () => {
       navigator.clipboard.writeText(message.message);
@@ -313,6 +328,11 @@ export const MemberDM = () => {
                     <div className="message-content">{messageText}</div>
                   </div>
                 </div>
+                {msg.user_id === currentUser?.id && (
+                  <div className="message-status" style={{ textAlign: "right", marginTop: "4px" }}>
+                    {msg.seen ? "✔✔" : "✔"}
+                  </div>
+                )}
               </div>
             </div>
           );
