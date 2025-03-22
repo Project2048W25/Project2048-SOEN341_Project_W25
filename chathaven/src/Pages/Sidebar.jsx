@@ -25,9 +25,6 @@ export const Sidebar = () => {
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
 
-  // Unread messages state (maps sender id to unread count)
-  const [unreadMessages, setUnreadMessages] = useState({});
-
   // Modals
   const [showTeamModal, setShowTeamModal] = useState(false);
   const [newTeamName, setNewTeamName] = useState("");
@@ -56,7 +53,9 @@ export const Sidebar = () => {
     ? location.pathname.split("/channel/")[1]
     : null;
 
+  // ----------------------------
   // Clear any persisted team selection on mount so default is "none"
+  // ----------------------------
   useEffect(() => {
     localStorage.removeItem("selectedTeam");
     setSelectedTeam(null);
@@ -68,7 +67,9 @@ export const Sidebar = () => {
     localStorage.setItem("selectedTeam", JSON.stringify(teamData));
   };
 
+  // ----------------------------
   // Fetch basic user info, teams, friends, etc.
+  // ----------------------------
   const fetchAllData = async () => {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError) {
@@ -104,7 +105,7 @@ export const Sidebar = () => {
 
     const { data: acceptedFriends, error: friendsError } = await supabase
       .from("friends")
-      .select("id, sender_id, receiver_id, sender:sender_id ( id, username, status), receiver:receiver_id ( id, username, status)")
+      .select("id, sender_id, receiver_id, sender:sender_id ( id, username, status), receiver:receiver_id ( id, username, status)") //added the status to sender & receiver
       .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
       .eq("status", "accepted")
       .order("created_at", { ascending: false });
@@ -138,7 +139,9 @@ export const Sidebar = () => {
     };
   }, []);
 
-  // Subscribe to team_members changes for realtime updates
+  // ----------------------------
+  // Subscribe to team_members changes for real-time updates
+  // ----------------------------
   useEffect(() => {
     if (!user) return;
     const teamsSubscription = supabase
@@ -154,70 +157,27 @@ export const Sidebar = () => {
     };
   }, [user]);
 
-  // Fetch unread messages for Direct Messages
-  useEffect(() => {
-    const fetchUnreadMessages = async () => {
-      if (!user) return;
-      const { data, error } = await supabase
-        .from("dms")
-        .select("user_id")
-        .eq("recipient_id", user.id)
-        .eq("seen", false);
-      if (error) {
-        console.error("Error fetching unread messages:", error);
-        return;
-      }
-      const counts = {};
-      data.forEach((msg) => {
-        counts[msg.user_id] = (counts[msg.user_id] || 0) + 1;
-      });
-      setUnreadMessages(counts);
-    };
-    fetchUnreadMessages();
-  }, [user]);
-
-  // Realtime subscription for new unread messages
-  useEffect(() => {
-    if (!user) return;
-    const subscription = supabase
-      .channel("unread_dms")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "dms",
-          filter: `recipient_id=eq.${user.id}`,
-        },
-        (payload) => {
-          if (!payload.new.seen) {
-            setUnreadMessages((prev) => ({
-              ...prev,
-              [payload.new.user_id]: (prev[payload.new.user_id] || 0) + 1,
-            }));
-          }
-        }
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, [user]);
-
+  // -----------------------------
   // Detecting online, offline, and away status
+  // -----------------------------
   useEffect(() => {
     const handleOnline = () => setStatus('online');
     const handleOffline = () => setStatus('offline');
+    
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+
+    // Turn on away status after 1 minute of inactivity
     let inactivityTimer;
     const handleUserActivity = () => {
       clearTimeout(inactivityTimer);
       setStatus('online');
-      inactivityTimer = setTimeout(() => setStatus('away'), 60000);
+      inactivityTimer = setTimeout(() => setStatus('away'), 60000); // 1 minute of inactivity
     };
+
     window.addEventListener('mousemove', handleUserActivity);
     window.addEventListener('keydown', handleUserActivity);
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -230,14 +190,21 @@ export const Sidebar = () => {
   // UI for Status Indicator
   const getStatusClass = (status) => {
     switch (status) {
-      case 'online': return 'status-online';
-      case 'offline': return 'status-offline';
-      case 'away': return 'status-away';
-      default: return '';
+      case 'online':
+        return 'status-online';
+      case 'offline':
+        return 'status-offline';
+      case 'away':
+        return 'status-away';
+      default:
+        return '';
     }
   };
 
+
+  // ----------------------------
   // Fetch channels and memberships for the current team
+  // ----------------------------
   useEffect(() => {
     if (!selectedTeam || !user) {
       setAllChannels([]);
@@ -245,6 +212,7 @@ export const Sidebar = () => {
       setChannelsForDisplay([]);
       return;
     }
+
     const fetchChannelsAndMemberships = async () => {
       const { data: teamChannels, error: chanError } = await supabase
         .from("channels")
@@ -256,6 +224,7 @@ export const Sidebar = () => {
       } else {
         setAllChannels(teamChannels || []);
       }
+
       const { data: memberships, error: memError } = await supabase
         .from("channel_members")
         .select("id, channel_id, status")
@@ -267,15 +236,19 @@ export const Sidebar = () => {
         setMyMemberships(memberships || []);
       }
     };
+
     fetchChannelsAndMemberships();
+
     const channelsSub = supabase
       .channel("channels_realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "channels" }, fetchChannelsAndMemberships)
       .subscribe();
+
     const membershipSub = supabase
       .channel("channel_members_realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "channel_members" }, fetchChannelsAndMemberships)
       .subscribe();
+
     return () => {
       supabase.removeChannel(channelsSub);
       supabase.removeChannel(membershipSub);
@@ -290,12 +263,17 @@ export const Sidebar = () => {
     }
     const combined = allChannels.map((ch) => {
       const membership = myMemberships.find((m) => m.channel_id === ch.id);
-      return { ...ch, membershipStatus: membership ? membership.status : "none" };
+      return {
+        ...ch,
+        membershipStatus: membership ? membership.status : "none",
+      };
     });
     setChannelsForDisplay(combined);
   }, [allChannels, myMemberships]);
 
+  // ----------------------------
   // Request to join channel
+  // ----------------------------
   const requestToJoinChannel = async (channel) => {
     try {
       const { error } = await supabase
@@ -311,7 +289,9 @@ export const Sidebar = () => {
     }
   };
 
+  // ----------------------------
   // Channel click handler
+  // ----------------------------
   const handleChannelClick = (channel) => {
     if (channel.membershipStatus === "accepted") {
       navigate(`/channel/${channel.id}`);
@@ -321,7 +301,9 @@ export const Sidebar = () => {
     }
   };
 
+  // ----------------------------
   // Create Team
+  // ----------------------------
   const createTeam = async () => {
     if (!newTeamName) return;
     try {
@@ -359,7 +341,9 @@ export const Sidebar = () => {
     }
   };
 
+  // ----------------------------
   // Create Channel (normal addition: status accepted)
+  // ----------------------------
   const createChannel = async () => {
     if (!selectedTeam || !newChannelName) return;
     try {
@@ -383,7 +367,9 @@ export const Sidebar = () => {
     }
   };
 
+  // ----------------------------
   // Invite User to Team (and add them to default channel "all-general")
+  // ----------------------------
   const openInviteTeamModal = (team) => {
     setTeamToInvite(team);
     setInviteUsername("");
@@ -440,7 +426,9 @@ export const Sidebar = () => {
     }
   };
 
+  // ----------------------------
   // Add User to Channel (normal addition: status accepted)
+  // ----------------------------
   const openAddUserModal = (channel) => {
     setSelectedChannel(channel);
     setUsernameToAdd("");
@@ -489,13 +477,17 @@ export const Sidebar = () => {
       setShowAddUserModal(false);
       setUsernameToAdd("");
       setSelectedChannel(null);
-      setTimeout(() => setAllChannels((prev) => [...prev]), 300);
+      setTimeout(() => {
+        setAllChannels((prev) => [...prev]);
+      }, 300);
     } catch (err) {
       console.error("Error adding user to channel:", err);
     }
   };
 
+  // ----------------------------
   // Friend Request Functions
+  // ----------------------------
   const sendFriendRequest = async () => {
     if (!friendUsername) {
       alert("Please enter a username.");
@@ -581,7 +573,9 @@ export const Sidebar = () => {
   // Helper: check if user is team owner
   const userIsOwnerOf = (team) => team && team.owner_id === user?.id;
 
-  // Leave Channel (for non‑Admin)
+  // ----------------------------
+  // Leave Channel (for non-Admin)
+  // ----------------------------
   const leaveChannel = async () => {
     if (!user || !currentChannelId) return;
     try {
@@ -602,7 +596,9 @@ export const Sidebar = () => {
     }
   };
 
+  // ----------------------------
   // Logout
+  // ----------------------------
   const handleLogout = async () => {
 
     const { data, error } = await supabase.auth.getSession();
@@ -627,10 +623,14 @@ export const Sidebar = () => {
       {/* Profile Showcase */}
       <div className="sidebar-profile">
         <div className="username">{username || "User"}</div>
-        <div className="role">{role || "Member"}</div>
-        <div className="user-status">
-          <span className={`status-indicator ${getStatusClass(status)}`}></span>
-          <span className="status-text">{status.charAt(0).toUpperCase() + status.slice(1)}</span>
+        <div className="role"> {role || "Member"}</div>
+
+        {/*User Presence indicator */}
+        <div className = "user-status">
+        <span className={`status-indicator ${getStatusClass(status)}`}></span>
+        <span className="status-text">
+          {status.charAt(0).toUpperCase() + status.slice(1)}
+        </span>
         </div>
       </div>
 
@@ -649,9 +649,6 @@ export const Sidebar = () => {
               >
                 <span className={`status-indicator ${getStatusClass(friendProfile.status)}`}></span>
                 <span className="dm-username">{friendProfile?.username}</span>
-                {unreadMessages[friendProfile.id] && (
-                  <span className="new-message-tag"> (NEW!)</span>
-                )}
               </li>
             );
           })}
@@ -717,11 +714,22 @@ export const Sidebar = () => {
                   key={channel.id}
                   className="channel-item"
                   onClick={() => handleChannelClick(channel)}
-                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", opacity: locked ? 0.6 : 1, cursor: "pointer" }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    opacity: locked ? 0.6 : 1,
+                    cursor: "pointer",
+                  }}
                 >
                   <span>{locked ? "🔒 " : ""}{channel.title}</span>
                   {!locked && channel.creator_id === user.id && (
-                    <button onClick={(e) => { e.stopPropagation(); openAddUserModal(channel); }}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openAddUserModal(channel);
+                      }}
+                    >
                       👤+
                     </button>
                   )}
@@ -742,49 +750,99 @@ export const Sidebar = () => {
         </button>
       )}
 
-      {/* MODALS */}
+      {/* ============ MODALS ============ */}
       {showTeamModal && (
         <div className="modal">
           <h4>Create a New Team</h4>
-          <input type="text" placeholder="Enter team name" value={newTeamName} onChange={(e) => setNewTeamName(e.target.value)} className="modal-input" />
-          <button className="modal-button" onClick={createTeam}>Create</button>
-          <button className="modal-close" onClick={() => setShowTeamModal(false)}>Close</button>
+          <input
+            type="text"
+            placeholder="Enter team name"
+            value={newTeamName}
+            onChange={(e) => setNewTeamName(e.target.value)}
+            className="modal-input"
+          />
+          <button className="modal-button" onClick={createTeam}>
+            Create
+          </button>
+          <button className="modal-close" onClick={() => setShowTeamModal(false)}>
+            Close
+          </button>
         </div>
       )}
 
       {showInviteTeamModal && (
         <div className="modal">
           <h4>Invite user to {teamToInvite?.name}</h4>
-          <input type="text" placeholder="Username" value={inviteUsername} onChange={(e) => setInviteUsername(e.target.value)} className="modal-input" />
-          <button className="modal-button" onClick={inviteUserToTeam}>Invite</button>
-          <button className="modal-close" onClick={() => { setShowInviteTeamModal(false); setTeamToInvite(null); }}>Close</button>
+          <input
+            type="text"
+            placeholder="Username"
+            value={inviteUsername}
+            onChange={(e) => setInviteUsername(e.target.value)}
+            className="modal-input"
+          />
+          <button className="modal-button" onClick={inviteUserToTeam}>
+            Invite
+          </button>
+          <button className="modal-close" onClick={() => { setShowInviteTeamModal(false); setTeamToInvite(null); }}>
+            Close
+          </button>
         </div>
       )}
 
       {showChannelModal && (
         <div className="modal">
           <h4>Create a New Channel</h4>
-          <input type="text" placeholder="Enter channel name" value={newChannelName} onChange={(e) => setNewChannelName(e.target.value)} className="modal-input" />
-          <button className="modal-button" onClick={createChannel}>Create</button>
-          <button className="modal-close" onClick={() => setShowChannelModal(false)}>Close</button>
+          <input
+            type="text"
+            placeholder="Enter channel name"
+            value={newChannelName}
+            onChange={(e) => setNewChannelName(e.target.value)}
+            className="modal-input"
+          />
+          <button className="modal-button" onClick={createChannel}>
+            Create
+          </button>
+          <button className="modal-close" onClick={() => setShowChannelModal(false)}>
+            Close
+          </button>
         </div>
       )}
 
       {showAddUserModal && (
         <div className="modal">
           <h4>Add user to {selectedChannel?.title}</h4>
-          <input type="text" placeholder="Enter username" value={usernameToAdd} onChange={(e) => setUsernameToAdd(e.target.value)} className="modal-input" />
-          <button className="modal-button" onClick={addUserToChannel}>Add</button>
-          <button className="modal-close" onClick={() => setShowAddUserModal(false)}>Close</button>
+          <input
+            type="text"
+            placeholder="Enter username"
+            value={usernameToAdd}
+            onChange={(e) => setUsernameToAdd(e.target.value)}
+            className="modal-input"
+          />
+          <button className="modal-button" onClick={addUserToChannel}>
+            Add
+          </button>
+          <button className="modal-close" onClick={() => setShowAddUserModal(false)}>
+            Close
+          </button>
         </div>
       )}
 
       {showAddFriendModal && (
         <div className="modal">
           <h4>Add a Friend</h4>
-          <input type="text" placeholder="Enter friend's username" value={friendUsername} onChange={(e) => setFriendUsername(e.target.value)} className="modal-input" />
-          <button className="modal-button" onClick={sendFriendRequest}>Send Request</button>
-          <button className="modal-close" onClick={() => setShowAddFriendModal(false)}>Close</button>
+          <input
+            type="text"
+            placeholder="Enter friend's username"
+            value={friendUsername}
+            onChange={(e) => setFriendUsername(e.target.value)}
+            className="modal-input"
+          />
+          <button className="modal-button" onClick={sendFriendRequest}>
+            Send Request
+          </button>
+          <button className="modal-close" onClick={() => setShowAddFriendModal(false)}>
+            Close
+          </button>
         </div>
       )}
 
@@ -793,16 +851,31 @@ export const Sidebar = () => {
         <div className="modal">
           <h4>Request to Join</h4>
           <p>Do you want to request to join the channel "{pendingChannel.title}"?</p>
-          <button className="modal-button" onClick={async () => {
-            await requestToJoinChannel(pendingChannel);
-            setShowJoinRequestModal(false);
-            setPendingChannel(null);
-          }}>Confirm</button>
-          <button className="modal-close" onClick={() => { setShowJoinRequestModal(false); setPendingChannel(null); }}>Cancel</button>
+          <button
+            className="modal-button"
+            onClick={async () => {
+              await requestToJoinChannel(pendingChannel);
+              setShowJoinRequestModal(false);
+              setPendingChannel(null);
+            }}
+          >
+            Confirm
+          </button>
+          <button
+            className="modal-close"
+            onClick={() => {
+              setShowJoinRequestModal(false);
+              setPendingChannel(null);
+            }}
+          >
+            Cancel
+          </button>
         </div>
       )}
 
-      <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      <button className="logout-btn" onClick={handleLogout}>
+        Logout
+      </button>
     </aside>
   );
 };
