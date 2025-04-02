@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Picker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
 import "./index.css";
+import {MdScheduleSend} from "react-icons/md";
 
 export const ChannelDM = () => {
   const { channelId } = useParams();
@@ -17,6 +18,9 @@ export const ChannelDM = () => {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [teamOwnerId, setTeamOwnerId] = useState(null);
+
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [selectedTime, setSelectedTime] = useState("");
 
   // Context Menu state
   const [contextMenu, setContextMenu] = useState({
@@ -259,6 +263,15 @@ export const ChannelDM = () => {
     );
   };
 
+  const handleSchedulerClick = () =>{
+    setShowDatePicker(true);
+  };
+
+  const handleSave = () =>{
+    console.log("Selected time:", selectedTime);
+    setShowDatePicker(false);
+  };
+
   return (
     <div className="main-container">
       <div className="dm-header">
@@ -393,6 +406,29 @@ export const ChannelDM = () => {
         <button className="send-button" onClick={handleSend}>
           Send
         </button>
+
+        {/*Schedule Button */}
+        <button onClick={handleSchedulerClick} className="schedule-button">
+          <MdScheduleSend size={30} color="FDFAF6"/>
+        </button>
+        
+        {showDatePicker && (
+        <div className="modal">
+          <h4>Pick date & time</h4>
+          <input
+            type="datetime-local"
+            value={selectedTime}
+            onChange={(e) => setSelectedTime(e.target.value)}
+            className="modal-input"
+          />
+          <div>
+            <button className="modal-close" onClick={() => setShowDatePicker(false)}>Cancel</button>
+            <button className="modal-button" onClick={handleSave}>Send</button>
+          </div>
+        </div>
+        )}
+
+        
       </div>
       {contextMenu.visible && (
         <ContextMenu
