@@ -5,6 +5,7 @@ import "./index.css";
 import { supabase } from "../utils/supabaseClient";
 import Picker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
+import {MdScheduleSend} from "react-icons/md";
 
 // Helper: Parse a chat message and extract plain text and reply data if present.
 export function parseChatMessage(message) {
@@ -172,6 +173,8 @@ const MemberDM = () => {
   const emojiButtonRef = useRef(null);
   const [showEmojis, setShowEmojis] = useState(false);
   const [emojiWindowPosition, setEmojiWindowPosition] = useState({ x: 0, y: 0 });
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedTime, setSelectedTime] = useState("");
 
   // Fetch current user
   useEffect(() => {
@@ -283,6 +286,15 @@ const MemberDM = () => {
     }
   };
 
+  const handleSchedulerClick = () =>{
+    setShowDatePicker(true);
+  };
+
+  const handleSave = () =>{
+    console.log("Selected time:", selectedTime);
+    setShowDatePicker(false);
+  };
+
   return (
     <div className="main-container">
       {/* DM Header with last seen indicator */}
@@ -368,6 +380,27 @@ const MemberDM = () => {
         <button onClick={handleSend} className="send-button">
           Send
         </button>
+
+        {/*Schedule Button */}
+        <button onClick={handleSchedulerClick} className="schedule-button">
+          <MdScheduleSend size={30} color="FDFAF6"/>
+        </button>
+
+        {showDatePicker && (
+        <div className="modal">
+          <h4>Pick date & time</h4>
+          <input
+            type="datetime-local"
+            value={selectedTime}
+            onChange={(e) => setSelectedTime(e.target.value)}
+            className="modal-input"
+          />
+          <div>
+            <button className="modal-close" onClick={() => setShowDatePicker(false)}>Cancel</button>
+            <button className="modal-button" onClick={handleSave}>Send</button>
+          </div>
+        </div>
+        )}
       </div>
 
       {/* Render Context Menu */}
