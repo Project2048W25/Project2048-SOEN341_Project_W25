@@ -5,7 +5,8 @@ import "./index.css";
 import { supabase } from "../utils/supabaseClient";
 import Picker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
-import {MdScheduleSend} from "react-icons/md";
+import { MdScheduleSend } from "react-icons/md";
+import { FiPaperclip } from "react-icons/fi"; // Media button icon
 
 // Helper: Parse a chat message and extract plain text and reply data if present.
 export function parseChatMessage(message) {
@@ -27,6 +28,10 @@ export function buildReplyMessage(replyMessage, newInput, currentUser, friendPro
     message: originalMessage,
     sender: replyMessage.user_id === currentUser.id ? "You" : friendProfile.username || "Unknown",
     senderId: replyMessage.user_id,
+    ...(replyMessage.media_url && {
+      media_url: replyMessage.media_url,
+      media_type: replyMessage.media_type,
+    }),
   };
   return JSON.stringify({ reply: replyData, message: newInput });
 }
@@ -36,10 +41,28 @@ export function formatTimestamp(timestamp) {
   return new Date(timestamp).toLocaleString();
 }
 
-// ContextMenu Component
+// Helper: get file extension from URL
+const getFileExtension = (url) => {
+  const cleanUrl = url.split('?')[0];
+  return cleanUrl.substring(cleanUrl.lastIndexOf('.') + 1).toLowerCase();
+};
+
+// Helper: detect media type based on file extension
+const detectMediaType = (url) => {
+  const ext = getFileExtension(url);
+  if (["png", "jpg", "jpeg", "gif"].includes(ext)) return "image";
+  if (ext === "mp4") return "video";
+  if (ext === "mp3") return "audio";
+  return null;
+};
+
 export const ContextMenu = ({ x, y, message, onClose, onReply, currentUser }) => {
   const handleCopy = () => {
-    navigator.clipboard.writeText(message.message);
+    if (message.media_url) {
+      navigator.clipboard.writeText(message.media_url);
+    } else {
+      navigator.clipboard.writeText(message.message);
+    }
     onClose();
   };
   const handleDelete = () => {
@@ -91,7 +114,6 @@ export const ContextMenu = ({ x, y, message, onClose, onReply, currentUser }) =>
   );
 };
 
-// MessageItem Component
 export const MessageItem = ({ msg, currentUser, username, setContextMenu }) => {
   const { text: messageText, replyData } = parseChatMessage(msg.message);
   const highlight = replyData && currentUser && replyData.senderId === currentUser.id;
@@ -121,7 +143,32 @@ export const MessageItem = ({ msg, currentUser, username, setContextMenu }) => {
                 <div className="replied-message-header">
                   <b>Replying to @{replyData.sender}:</b>
                 </div>
-                <div className="replied-message-content">"{replyData.message}"</div>
+                <div className="replied-message-content">
+                  {replyData.media_url ? (
+                    replyData.media_type.startsWith("image") ? (
+                      <img src={replyData.media_url} alt="replied media" style={{ maxWidth: "100px", maxHeight: "100px" }} />
+                    ) : replyData.media_type.startsWith("video") ? (
+                      <video controls src={replyData.media_url} style={{ width: "120px", height: "80px" }} />
+                    ) : replyData.media_type.startsWith("audio") ? (
+                      <audio controls src={replyData.media_url} style={{ width: "150px" }} />
+                    ) : null
+                  ) : (
+                    `"${replyData.message}"`
+                  )}
+                </div>
+              </div>
+            )}
+            {msg.media_url && (
+              <div className="media-content" style={{ marginBottom: "8px" }}>
+                {msg.media_type && msg.media_type.startsWith("image") && (
+                  <img src={msg.media_url} alt="sent media" style={{ maxWidth: "300px", maxHeight: "300px" }} />
+                )}
+                {msg.media_type && msg.media_type.startsWith("video") && (
+                  <video controls src={msg.media_url} style={{ width: "300px", height: "200px" }} />
+                )}
+                {msg.media_type && msg.media_type.startsWith("audio") && (
+                  <audio controls src={msg.media_url} style={{ width: "300px" }} />
+                )}
               </div>
             )}
             <div className="message-content">{messageText}</div>
@@ -137,7 +184,6 @@ export const MessageItem = ({ msg, currentUser, username, setContextMenu }) => {
   );
 };
 
-// ReplyPreview Component
 export const ReplyPreview = ({ replyMessage, currentUser, friendProfile, onCancel }) => {
   const { text } = parseChatMessage(replyMessage.message);
   return (
@@ -146,7 +192,17 @@ export const ReplyPreview = ({ replyMessage, currentUser, friendProfile, onCance
         <b>
           Replying to {replyMessage.user_id === currentUser?.id ? "You" : friendProfile.username || "Unknown"}:
         </b>{" "}
-        "{text}"
+        {replyMessage.media_url ? (
+          replyMessage.media_type.startsWith("image") ? (
+            <img src={replyMessage.media_url} alt="replied media" style={{ maxWidth: "100px", maxHeight: "100px" }} />
+          ) : replyMessage.media_type.startsWith("video") ? (
+            <video controls src={replyMessage.media_url} style={{ width: "120px", height: "80px" }} />
+          ) : replyMessage.media_type.startsWith("audio") ? (
+            <audio controls src={replyMessage.media_url} style={{ width: "150px" }} />
+          ) : null
+        ) : (
+          `"${text}"`
+        )}
       </div>
       <button className="cancel-reply" onClick={onCancel}>
         X
@@ -155,7 +211,6 @@ export const ReplyPreview = ({ replyMessage, currentUser, friendProfile, onCance
   );
 };
 
-// EmojiPicker Component
 export const EmojiPicker = ({ emojiButtonRef, position, onSelect }) => (
   <div ref={emojiButtonRef} style={{ top: `${position.y}px`, left: `${position.x}px`, zIndex: 1000 }}>
     <Picker data={emojiData} navPosition={"bottom"} onEmojiSelect={onSelect} />
@@ -175,8 +230,24 @@ const MemberDM = () => {
   const [emojiWindowPosition, setEmojiWindowPosition] = useState({ x: 0, y: 0 });
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedTime, setSelectedTime] = useState("");
+  const [mediaFile, setMediaFile] = useState(null);
+  const mediaInputRef = useRef(null);
 
-  // Fetch current user
+  // onPaste handler to capture clipboard images
+  const handlePaste = (e) => {
+    const clipboardData = e.clipboardData;
+    const items = clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.kind === "file" && item.type.startsWith("image/")) {
+        const blob = item.getAsFile();
+        setMediaFile(blob);
+        e.preventDefault();
+        break;
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -185,7 +256,6 @@ const MemberDM = () => {
     fetchUser();
   }, []);
 
-  // Fetch friend profile (including last_seen)
   useEffect(() => {
     const fetchFriendProfile = async () => {
       const { data: friendData } = await supabase
@@ -198,13 +268,12 @@ const MemberDM = () => {
     if (username) fetchFriendProfile();
   }, [username]);
 
-  // Fetch messages and subscribe to new ones
   useEffect(() => {
     if (!currentUser || !friendProfile) return;
     const fetchMessages = async () => {
       const { data: dms } = await supabase
         .from("dms")
-        .select("*")
+        .select("*, media_url, media_type")
         .or(
           `and(user_id.eq.${currentUser.id},recipient_id.eq.${friendProfile.id}),and(user_id.eq.${friendProfile.id},recipient_id.eq.${currentUser.id})`
         )
@@ -231,7 +300,6 @@ const MemberDM = () => {
     return () => supabase.removeChannel(subscription);
   }, [currentUser, friendProfile]);
 
-  // Mark incoming messages as seen when conversation opens
   useEffect(() => {
     if (!currentUser || !friendProfile) return;
     const markMessagesAsSeen = async () => {
@@ -244,7 +312,6 @@ const MemberDM = () => {
     markMessagesAsSeen();
   }, [currentUser, friendProfile]);
 
-  // Close emoji picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (emojiButtonRef.current && !emojiButtonRef.current.contains(event.target)) {
@@ -255,28 +322,65 @@ const MemberDM = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Toggle emoji picker and record click position
   const handleEmojiButtonClick = (event) => {
     setShowEmojis((prev) => !prev);
     setEmojiWindowPosition({ x: event.clientX, y: event.clientY });
   };
 
-  // Send message (handles replies)
+  const handleMediaChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setMediaFile(file);
+    }
+  };
+
   const handleSend = async () => {
-    if (input.trim() && currentUser && friendProfile) {
-      const finalMessage = replyMessage
-        ? buildReplyMessage(replyMessage, input, currentUser, friendProfile)
-        : input;
-      const newMessage = {
-        message: finalMessage,
+    if ((input.trim() === "") && !mediaFile) return;
+    if (
+      !mediaFile &&
+      input.trim().startsWith("http") &&
+      input.includes("supabase.co/storage") &&
+      input.includes("chat-media")
+    ) {
+      const media_url = input.trim();
+      const media_type = detectMediaType(media_url);
+      const { error } = await supabase.from("dms").insert({
+        message: "",
         user_id: currentUser.id,
         recipient_id: friendProfile.id,
-      };
-      const { error } = await supabase.from("dms").insert(newMessage);
-      if (error) console.error("Error sending message:", error);
+        media_url,
+        media_type,
+      });
+      if (error) console.error("Error sending media message:", error);
       setInput("");
-      setReplyMessage(null);
+      return;
     }
+    let media_url = null;
+    let media_type = null;
+    if (mediaFile) {
+      const filePath = `media/${currentUser.id}-${Date.now()}-${mediaFile.name}`;
+      const { error: uploadError } = await supabase.storage.from("chat-media").upload(filePath, mediaFile);
+      if (uploadError) {
+        console.error("Error uploading media:", uploadError);
+        return;
+      }
+      const { data: { publicUrl } = {} } = supabase.storage.from("chat-media").getPublicUrl(filePath);
+      media_url = publicUrl;
+      media_type = mediaFile.type;
+    }
+    const finalMessage = replyMessage ? buildReplyMessage(replyMessage, input, currentUser, friendProfile) : input;
+    const newMessage = {
+      message: finalMessage,
+      user_id: currentUser.id,
+      recipient_id: friendProfile.id,
+      ...(media_url && { media_url }),
+      ...(media_type && { media_type }),
+    };
+    const { error } = await supabase.from("dms").insert(newMessage);
+    if (error) console.error("Error sending message:", error);
+    setInput("");
+    setReplyMessage(null);
+    setMediaFile(null);
   };
 
   const handleKeyDown = (event) => {
@@ -286,28 +390,30 @@ const MemberDM = () => {
     }
   };
 
-  const handleSchedulerClick = () =>{
+  const handleSchedulerClick = () => {
     setShowDatePicker(true);
   };
 
-  const handleSave = () =>{
+  const handleSave = () => {
     console.log("Selected time:", selectedTime);
     setShowDatePicker(false);
   };
 
   return (
     <div className="main-container">
-      {/* DM Header with last seen indicator */}
       <div className="dm-header">
         <span className="username">{username}</span>
         {friendProfile?.status && (
           <div className="user-status">
             <span className={`status-indicator ${(() => {
               switch (friendProfile.status) {
-                case "online": return "status-online";
-                case "away": return "status-away";
-                case "offline": 
-                default: return "status-offline";
+                case "online":
+                  return "status-online";
+                case "away":
+                  return "status-away";
+                case "offline":
+                default:
+                  return "status-offline";
               }
             })()}`}></span>
             <span className="status-text">
@@ -322,7 +428,6 @@ const MemberDM = () => {
         )}
       </div>
 
-      {/* Chat Messages */}
       <div className="chat-messages">
         {messages.map((msg) => (
           <MessageItem
@@ -335,7 +440,6 @@ const MemberDM = () => {
         ))}
       </div>
 
-      {/* Reply Preview */}
       {replyMessage && friendProfile && (
         <ReplyPreview
           replyMessage={replyMessage}
@@ -345,16 +449,25 @@ const MemberDM = () => {
         />
       )}
 
-      {/* Emoji Picker */}
-      {showEmojis && (
-        <EmojiPicker
-          emojiButtonRef={emojiButtonRef}
-          position={emojiWindowPosition}
-          onSelect={(emoji) => setInput(input + emoji.native)}
-        />
+      {mediaFile && (
+        <div className="reply-preview">
+          <div>
+            <b>Media attached to message:</b> {mediaFile.name} ({(mediaFile.size / (1024 * 1024)).toFixed(2)}MB)
+          </div>
+          <button className="cancel-reply" onClick={() => setMediaFile(null)}>
+            X
+          </button>
+        </div>
       )}
+      
+      {showEmojis && (
+       <EmojiPicker
+         emojiButtonRef={emojiButtonRef}
+          position={emojiWindowPosition}
+         onSelect={(emoji) => setInput(input + emoji.native)}
+        />
+    )}
 
-      {/* Message Input */}
       <div className="chat-input-container">
         <button type="button" onClick={handleEmojiButtonClick} className="emoji-button">
           <svg
@@ -369,41 +482,51 @@ const MemberDM = () => {
             <path d="M8 7a2 2 0 1 0-.001 3.999A2 2 0 0 0 8 7M16 7a2 2 0 1 0-.001 3.999A2 2 0 0 0 16 7M15.232 15c-.693 1.195-1.87 2-3.349 2-1.477 0-2.655-.805-3.347-2H15m3-2H6a6 6 0 1 0 12 0" />
           </svg>
         </button>
+        <button type="button" onClick={() => mediaInputRef.current.click()} className="media-button" disabled={!!mediaFile}>
+          <FiPaperclip size={28} color="white" />
+        </button>
+        <input
+          type="file"
+          ref={mediaInputRef}
+          style={{ display: "none" }}
+          accept="image/*,video/mp4,audio/mp3"
+          onChange={handleMediaChange}
+        />
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
           placeholder="Write message"
           className="chat-input"
         />
-        <button onClick={handleSend} className="send-button">
+        <button className="send-button" onClick={handleSend}>
           Send
         </button>
-
-        {/*Schedule Button */}
         <button onClick={handleSchedulerClick} className="schedule-button">
-          <MdScheduleSend size={30} color="FDFAF6"/>
+          <MdScheduleSend size={30} color="FDFAF6" />
         </button>
-
         {showDatePicker && (
-        <div className="modal">
-          <h4>Pick date & time</h4>
-          <input
-            type="datetime-local"
-            value={selectedTime}
-            onChange={(e) => setSelectedTime(e.target.value)}
-            className="modal-input"
-          />
-          <div>
-            <button className="modal-close" onClick={() => setShowDatePicker(false)}>Cancel</button>
-            <button className="modal-button" onClick={handleSave}>Send</button>
+          <div className="modal">
+            <h4>Pick date & time</h4>
+            <input
+              type="datetime-local"
+              value={selectedTime}
+              onChange={(e) => setSelectedTime(e.target.value)}
+              className="modal-input"
+            />
+            <div>
+              <button className="modal-close" onClick={() => setShowDatePicker(false)}>
+                Cancel
+              </button>
+              <button className="modal-button" onClick={handleSave}>
+                Send
+              </button>
+            </div>
           </div>
-        </div>
         )}
       </div>
-
-      {/* Render Context Menu */}
       {contextMenu.visible && (
         <ContextMenu
           x={contextMenu.x}
@@ -411,6 +534,7 @@ const MemberDM = () => {
           message={contextMenu.message}
           onClose={() => setContextMenu({ ...contextMenu, visible: false, message: null })}
           onReply={(msg) => setReplyMessage(msg)}
+          // In MemberDM, we do not pass role/teamOwnerId since they're not defined.
           currentUser={currentUser}
         />
       )}
