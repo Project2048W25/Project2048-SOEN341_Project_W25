@@ -368,6 +368,12 @@ export const ChannelDM = () => {
     setShowDatePicker(false);
   };
 
+    const messagesEndRef = useRef(null);
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+        }
+    }, [messages]);
   return (
     <div className="main-container">
       <div className="dm-header">
@@ -450,6 +456,7 @@ export const ChannelDM = () => {
             </div>
           );
         })}
+        <div ref={messagesEndRef} />
       </div>
       {replyMessage && (
         <div className="reply-preview">

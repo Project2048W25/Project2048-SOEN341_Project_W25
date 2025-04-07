@@ -399,6 +399,13 @@ const MemberDM = () => {
     setShowDatePicker(false);
   };
 
+  const messagesEndRef = useRef(null);
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+    }
+  }, [messages]);
+
   return (
     <div className="main-container">
       <div className="dm-header">
@@ -438,6 +445,7 @@ const MemberDM = () => {
             setContextMenu={setContextMenu}
           />
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       {replyMessage && friendProfile && (
