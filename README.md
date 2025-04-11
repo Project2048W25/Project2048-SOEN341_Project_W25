@@ -22,7 +22,7 @@ Finding a secure and minimal platform for both team collaboration and private me
 | Bertin   | 40157663 | Front-end  |
 | Kevin    | 40283037 | Full-stack |
 | Khaled    |  40231852  | Front-end    |
-| Vedang    |  40202302 | Back-end   |
+| Vedang    |  40202302 | Front-end   |
 | William    | 40215391 | Back-end   |
 
 ## Technologies Used
