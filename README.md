@@ -29,9 +29,9 @@ Finding a secure and minimal platform for both team collaboration and private me
 1. **React** - For building the user interfaces.
 2. **Figma** - For UI/UX design and prototyping.
 3. **Javascript** - Backend and Frontend.
-3. **Node.js** - For backend development.
-4. **TailwindCSSv4.x** - For styling and design.
-5. **Supabase** - backend-as-a-service: DB, Auth, etc. 
+4. **Node.js** - For backend development.
+5. **TailwindCSSv4.x** - For styling and design.
+6. **Supabase** - backend-as-a-service: DB, Auth, etc. 
 
 ## Members Description
 **Gloria Teta (40211953)**: Computer engineering student passionate about coding and design, with experience in programming languages and UI/UX design, particularly Figma. Currently learning React.js and JavaScript throughout this project which focusing on the frontend development. 
