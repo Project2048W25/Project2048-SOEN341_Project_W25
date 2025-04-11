@@ -45,5 +45,5 @@ Finding a secure and minimal platform for both team collaboration and private me
 **Vedang Dubey (40202302)**: Aerospace Engineering major with a specialisation in Avionics and Control systems. Currently assisting with the Backend of the Chathaven team and ensuring interface runs without bugs and errors.
 
 **William Ma (40215391)**: Computer Engineering major with expertise in React Native Expo application development. Specializes in database design and authentication systems within the Chathaven team. Also contributes strategic insights on optimizing the backend tech stack for efficiency and quality.
---- 
 
+---
