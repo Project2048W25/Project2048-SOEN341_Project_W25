@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
 import { createPortal } from "react-dom";
@@ -6,7 +6,7 @@ import Picker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
 import "./index.css";
 import { MdScheduleSend } from "react-icons/md";
-import { FiPaperclip } from "react-icons/fi"; // Media button icon
+import { FiPaperclip } from "react-icons/fi";
 
 // Helper: get file extension from URL
 const getFileExtension = (url) => {
@@ -38,6 +38,18 @@ export const ChannelDM = () => {
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedTime, setSelectedTime] = useState("");
+
+  // Update current time every 1 second for faster filtering.
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Memoized filtered messages (only those whose scheduled_time is <= now)
+  const filteredMessages = useMemo(() => {
+    return messages.filter((msg) => new Date(msg.scheduled_time) <= now);
+  }, [messages, now]);
 
   // Context Menu state
   const [contextMenu, setContextMenu] = useState({
@@ -180,11 +192,11 @@ export const ChannelDM = () => {
       }
     };
 
-    // Fetch messages joined with profiles
+    // Fetch messages joined with profiles – note scheduled_time is included.
     const fetchMessages = async () => {
       const { data, error } = await supabase
         .from("messages")
-        .select("id, message, user_id, created_at, channel_id, profiles(username), media_url, media_type")
+        .select("id, message, user_id, created_at, scheduled_time, channel_id, profiles(username), media_url, media_type")
         .eq("channel_id", channelId)
         .order("created_at", { ascending: true });
       if (error) {
@@ -247,6 +259,7 @@ export const ChannelDM = () => {
     }
   };
 
+  // Immediate send: scheduled_time is set to current time
   const handleSend = async () => {
     if (!input.trim() && !mediaFile) return;
 
@@ -268,6 +281,7 @@ export const ChannelDM = () => {
             message: finalMessage,
             channel_id: channelId,
             user_id: user.id,
+            scheduled_time: new Date().toISOString(),
             media_url,
             media_type,
           },
@@ -285,7 +299,7 @@ export const ChannelDM = () => {
       return;
     }
 
-    // If replying, include reply data (propagating media info if present)
+    // If replying, include reply data
     if (replyMessage) {
       let originalMessage = replyMessage.message;
       try {
@@ -329,6 +343,7 @@ export const ChannelDM = () => {
           message: finalMessage,
           channel_id: channelId,
           user_id: user.id,
+          scheduled_time: new Date().toISOString(),
           ...(media_url && { media_url }),
           ...(media_type && { media_type }),
         },
@@ -347,6 +362,78 @@ export const ChannelDM = () => {
     }
   };
 
+  // Scheduled send: scheduled_time is taken from user input (or defaults to now)
+  const handleScheduledSend = async () => {
+    if (!input.trim() && !mediaFile) return;
+
+    let finalMessage = input;
+    if (replyMessage) {
+      let originalMessage = replyMessage.message;
+      try {
+        const parsedReply = JSON.parse(replyMessage.message);
+        if (parsedReply && parsedReply.reply && parsedReply.message) {
+          originalMessage = parsedReply.message;
+        }
+      } catch (e) {
+        // Not a JSON structure.
+      }
+      const replyData = {
+        message: originalMessage,
+        sender: replyMessage.user_id === user?.id ? "You" : replyMessage.profiles?.username || "Unknown",
+        senderId: replyMessage.user_id,
+        ...(replyMessage.media_url && {
+          media_url: replyMessage.media_url,
+          media_type: replyMessage.media_type,
+        }),
+      };
+      finalMessage = JSON.stringify({ reply: replyData, message: input });
+    }
+
+    let media_url = null;
+    let media_type = null;
+    if (mediaFile) {
+      const filePath = `media/${user.id}-${Date.now()}-${mediaFile.name}`;
+      const { error: uploadError } = await supabase.storage.from("chat-media").upload(filePath, mediaFile);
+      if (uploadError) {
+        console.error("Error uploading media:", uploadError);
+        return;
+      }
+      const { data: { publicUrl } = {} } = supabase.storage.from("chat-media").getPublicUrl(filePath);
+      media_url = publicUrl;
+      media_type = mediaFile.type;
+    }
+
+    // Use scheduled time from the input, or fallback to now.
+    const scheduledTime = selectedTime ? new Date(selectedTime).toISOString() : new Date().toISOString();
+
+    const { data, error } = await supabase
+      .from("messages")
+      .insert([
+        {
+          message: finalMessage,
+          channel_id: channelId,
+          user_id: user.id,
+          scheduled_time: scheduledTime,
+          ...(media_url && { media_url }),
+          ...(media_type && { media_type }),
+        },
+      ])
+      .select();
+    if (error) {
+      console.error("Error sending scheduled message:", error);
+    } else if (data && data.length > 0) {
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === data[0].id)) return prev;
+        return [...prev, data[0]];
+      });
+    }
+    setInput("");
+    setReplyMessage(null);
+    setMediaFile(null);
+    setSelectedTime("");
+    setShowDatePicker(false);
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -363,24 +450,20 @@ export const ChannelDM = () => {
     setShowDatePicker(true);
   };
 
-  const handleSave = () => {
-    console.log("Selected time:", selectedTime);
-    setShowDatePicker(false);
-  };
+  const messagesEndRef = useRef(null);
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "auto" });
+    }
+  }, [messages]);
 
-    const messagesEndRef = useRef(null);
-    useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: "auto" });
-        }
-    }, [messages]);
   return (
     <div className="main-container">
       <div className="dm-header">
         <span className="username">#{channelName}</span>
       </div>
       <div className="chat-messages">
-        {messages.map((msg) => {
+        {filteredMessages.map((msg) => {
           let messageText = msg.message;
           let replyData = null;
           try {
@@ -408,8 +491,9 @@ export const ChannelDM = () => {
               }}
             >
               <div className="message-bundle">
+                {/* Display the scheduled_time instead of created_at */}
                 <div className="message-timestamp">
-                  {new Date(msg.created_at).toLocaleString()}
+                  {new Date(msg.scheduled_time).toLocaleString()}
                 </div>
                 <div className="message__outer">
                   <div className="message__bubble">
@@ -566,7 +650,7 @@ export const ChannelDM = () => {
               <button className="modal-close" onClick={() => setShowDatePicker(false)}>
                 Cancel
               </button>
-              <button className="modal-button" onClick={handleSave}>
+              <button className="modal-button" onClick={handleScheduledSend}>
                 Send
               </button>
             </div>
