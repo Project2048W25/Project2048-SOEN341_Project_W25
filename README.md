@@ -26,11 +26,12 @@ Finding a secure and minimal platform for both team collaboration and private me
 | William    | 40215391 | Back-end   |
 
 ## Technologies Used
-- React
-- Figma
-- TypeScript
-- Nodejs
-- Etc..
+1. **React** - For building the user interfaces.
+2. **Figma** - For UI/UX design and prototyping.
+3. **Javascript** - Backend and Frontend.
+4. **Node.js** - For backend development.
+5. **TailwindCSSv4.x** - For styling and design.
+6. **Supabase** - backend-as-a-service: DB, Auth, etc. 
 
 ## Members Description
 **Gloria Teta (40211953)**: Computer engineering student passionate about coding and design, with experience in programming languages and UI/UX design, particularly Figma. Currently learning React.js and JavaScript throughout this project which focusing on the frontend development. 
@@ -44,4 +45,5 @@ Finding a secure and minimal platform for both team collaboration and private me
 **Vedang Dubey (40202302)**: Aerospace Engineering major with a specialisation in Avionics and Control systems. Currently assisting with the Backend of the Chathaven team and ensuring interface runs without bugs and errors.
 
 **William Ma (40215391)**: Computer Engineering major with expertise in React Native Expo application development. Specializes in database design and authentication systems within the Chathaven team. Also contributes strategic insights on optimizing the backend tech stack for efficiency and quality.
+--- 
 
