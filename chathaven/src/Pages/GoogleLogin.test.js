@@ -1,16 +1,16 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import '@testing-library/jest-dom/extend-expect';
-import GoogleLoginButton from "./GoogleLoginButton"; 
-import authService from "../services/auth";
+import GoogleLoginButton from "./GoogleLoginButton.jsx";
+import authService from "../services/authService";
 
-jest.mock("../services/auth", () => ({
+jest.mock("../services/authService", () => ({
   googleLogin: jest.fn(),
 }));
+
 
 describe("Google Login Tests", () => {
   test("Google login button renders and triggers login", () => {
     render(<GoogleLoginButton />);
-    const button = screen.getByText("Sign in with Google");
+    const button = screen.getByAltText("Sign in with Google");
     fireEvent.click(button);
 
     expect(authService.googleLogin).toHaveBeenCalled();

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import '@testing-library/jest-dom/extend-expect';
-import Chat from "./Chat";  // Adjust if necessary
+import { BrowserRouter as Router } from "react-router-dom";
+import ChannelDM from "./ChannelDM.jsx"; // Adjust if necessary
 import chatService from "../services/chat";
 
 jest.mock("../services/chat", () => ({
@@ -10,12 +10,12 @@ jest.mock("../services/chat", () => ({
 
 describe("Chat Functionality Tests", () => {
   test("Chat page renders correctly", () => {
-    render(<Chat />);
+    render(<Router><ChannelDM /></Router>);
     expect(screen.getByPlaceholderText("Type a message...")).toBeInTheDocument();
   });
 
   test("User can send a message", () => {
-    render(<Chat />);
+    render(<Router><ChannelDM /></Router>);
     const input = screen.getByPlaceholderText("Type a message...");
     fireEvent.change(input, { target: { value: "Hello!" } });
     fireEvent.keyPress(input, { key: "Enter", code: "Enter" });

@@ -4,7 +4,7 @@ import google_icon from "../icons/devicon_google.svg";
 import { signInWithEmail, signInWithGoogle } from "../services/authService";
 import { getProfileByUsername } from "../services/profileService";
 
-export const Login = () => {
+const Login = () => {
     const handleLoginSubmit = async (event) => {
         event.preventDefault();
         const username = event.target.username.value;
@@ -70,3 +70,5 @@ export const Login = () => {
         </div>
     );
 };
+
+export default Login;

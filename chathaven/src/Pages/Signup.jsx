@@ -3,7 +3,7 @@ import google_icon from "../icons/devicon_google.svg";
 import { signInWithGoogle } from "../services/authService";
 import { signUpUser } from "../services/userService";
 
-export const Signup = () => {
+const Signup = () => {
     const [userType, setUserType] = useState("Member");
 
     const handleSignUpSubmit = async (event) => {
@@ -42,7 +42,6 @@ export const Signup = () => {
                     <input type="password" name="password" placeholder="Password" required className="w-full px-4 py-3 rounded-xl border border-white bg-transparent text-white text-xl" />
                     <input type="password" name="confirmPassword" placeholder="Confirm Password" required className="w-full px-4 py-3 rounded-xl border border-white bg-transparent text-white text-xl" />
 
-                    {/* User Type Selection */}
                     <div className="flex justify-center gap-4 mt-4">
                         <button type="button" onClick={() => setUserType("Member")} className={`w-1/2 py-3 rounded-xl font-semibold transition-all transform duration-300 shadow-md text-lg flex items-center justify-center
                             ${userType === "Member" ? "bg-gradient-to-r from-green-400 to-green-600 text-white scale-105 border-2 border-green-300" : "bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-600"}`}>Member</button>
@@ -66,3 +65,5 @@ export const Signup = () => {
         </div>
     );
 };
+
+export default Signup;

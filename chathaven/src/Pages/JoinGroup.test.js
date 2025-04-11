@@ -1,6 +1,6 @@
+import { BrowserRouter as Router } from "react-router-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
-import '@testing-library/jest-dom/extend-expect';
-import Chat from "./Chat";  
+import ChannelDM from "./ChannelDM.jsx";
 import chatService from "../services/chat";
 
 jest.mock("../services/chat", () => ({
@@ -9,7 +9,7 @@ jest.mock("../services/chat", () => ({
 
 describe("Group Joining Tests", () => {
   test("User can join a group", () => {
-    render(<Chat />);
+    render(<Router><ChannelDM /></Router>);
     const joinButton = screen.getByText("Join Group");
     fireEvent.click(joinButton);
 
