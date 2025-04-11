@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { createPortal } from "react-dom";
 import "./index.css";
@@ -6,7 +6,7 @@ import { supabase } from "../utils/supabaseClient";
 import Picker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
 import { MdScheduleSend } from "react-icons/md";
-import { FiPaperclip } from "react-icons/fi"; // Media button icon
+import { FiPaperclip } from "react-icons/fi";
 
 // Helper: Parse a chat message and extract plain text and reply data if present.
 export function parseChatMessage(message) {
@@ -132,7 +132,8 @@ export const MessageItem = ({ msg, currentUser, username, setContextMenu }) => {
       onContextMenu={handleContextMenu}
     >
       <div className="message-bundle">
-        <div className="message-timestamp">{formatTimestamp(msg.created_at)}</div>
+        {/* Use scheduled_time instead of created_at */}
+        <div className="message-timestamp">{formatTimestamp(msg.scheduled_time)}</div>
         <div className="message__outer">
           <div className="message__bubble">
             <div className="sender-name">
@@ -233,6 +234,18 @@ const MemberDM = () => {
   const [mediaFile, setMediaFile] = useState(null);
   const mediaInputRef = useRef(null);
 
+  // Update current time every 1 second for faster scheduled DM rendering.
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Memoized filtering of DM messages.
+  const filteredMessages = useMemo(() => {
+    return messages.filter((msg) => new Date(msg.scheduled_time) <= now);
+  }, [messages, now]);
+
   // onPaste handler to capture clipboard images
   const handlePaste = (e) => {
     const clipboardData = e.clipboardData;
@@ -273,7 +286,7 @@ const MemberDM = () => {
     const fetchMessages = async () => {
       const { data: dms } = await supabase
         .from("dms")
-        .select("*, media_url, media_type")
+        .select("*, scheduled_time, media_url, media_type")
         .or(
           `and(user_id.eq.${currentUser.id},recipient_id.eq.${friendProfile.id}),and(user_id.eq.${friendProfile.id},recipient_id.eq.${currentUser.id})`
         )
@@ -334,6 +347,7 @@ const MemberDM = () => {
     }
   };
 
+  // Immediate DM send: scheduled_time is set to now.
   const handleSend = async () => {
     if ((input.trim() === "") && !mediaFile) return;
     if (
@@ -348,6 +362,7 @@ const MemberDM = () => {
         message: "",
         user_id: currentUser.id,
         recipient_id: friendProfile.id,
+        scheduled_time: new Date().toISOString(),
         media_url,
         media_type,
       });
@@ -373,6 +388,7 @@ const MemberDM = () => {
       message: finalMessage,
       user_id: currentUser.id,
       recipient_id: friendProfile.id,
+      scheduled_time: new Date().toISOString(),
       ...(media_url && { media_url }),
       ...(media_type && { media_type }),
     };
@@ -381,6 +397,41 @@ const MemberDM = () => {
     setInput("");
     setReplyMessage(null);
     setMediaFile(null);
+  };
+
+  // Scheduled DM send: scheduled_time is taken from the datetime input (or defaults to now)
+  const handleScheduledSend = async () => {
+    if ((input.trim() === "") && !mediaFile) return;
+    let media_url = null;
+    let media_type = null;
+    if (mediaFile) {
+      const filePath = `media/${currentUser.id}-${Date.now()}-${mediaFile.name}`;
+      const { error: uploadError } = await supabase.storage.from("chat-media").upload(filePath, mediaFile);
+      if (uploadError) {
+        console.error("Error uploading media:", uploadError);
+        return;
+      }
+      const { data: { publicUrl } = {} } = supabase.storage.from("chat-media").getPublicUrl(filePath);
+      media_url = publicUrl;
+      media_type = mediaFile.type;
+    }
+    const finalMessage = replyMessage ? buildReplyMessage(replyMessage, input, currentUser, friendProfile) : input;
+    const scheduledTime = selectedTime ? new Date(selectedTime).toISOString() : new Date().toISOString();
+    const newMessage = {
+      message: finalMessage,
+      user_id: currentUser.id,
+      recipient_id: friendProfile.id,
+      scheduled_time: scheduledTime,
+      ...(media_url && { media_url }),
+      ...(media_type && { media_type }),
+    };
+    const { error } = await supabase.from("dms").insert(newMessage);
+    if (error) console.error("Error sending scheduled message:", error);
+    setInput("");
+    setReplyMessage(null);
+    setMediaFile(null);
+    setSelectedTime("");
+    setShowDatePicker(false);
   };
 
   const handleKeyDown = (event) => {
@@ -392,11 +443,6 @@ const MemberDM = () => {
 
   const handleSchedulerClick = () => {
     setShowDatePicker(true);
-  };
-
-  const handleSave = () => {
-    console.log("Selected time:", selectedTime);
-    setShowDatePicker(false);
   };
 
   const messagesEndRef = useRef(null);
@@ -436,7 +482,7 @@ const MemberDM = () => {
       </div>
 
       <div className="chat-messages">
-        {messages.map((msg) => (
+        {filteredMessages.map((msg) => (
           <MessageItem
             key={msg.id}
             msg={msg}
@@ -467,14 +513,14 @@ const MemberDM = () => {
           </button>
         </div>
       )}
-      
+
       {showEmojis && (
-       <EmojiPicker
-         emojiButtonRef={emojiButtonRef}
+        <EmojiPicker
+          emojiButtonRef={emojiButtonRef}
           position={emojiWindowPosition}
-         onSelect={(emoji) => setInput(input + emoji.native)}
+          onSelect={(emoji) => setInput(input + emoji.native)}
         />
-    )}
+      )}
 
       <div className="chat-input-container">
         <button type="button" onClick={handleEmojiButtonClick} className="emoji-button">
@@ -528,7 +574,7 @@ const MemberDM = () => {
               <button className="modal-close" onClick={() => setShowDatePicker(false)}>
                 Cancel
               </button>
-              <button className="modal-button" onClick={handleSave}>
+              <button className="modal-button" onClick={handleScheduledSend}>
                 Send
               </button>
             </div>
@@ -542,7 +588,6 @@ const MemberDM = () => {
           message={contextMenu.message}
           onClose={() => setContextMenu({ ...contextMenu, visible: false, message: null })}
           onReply={(msg) => setReplyMessage(msg)}
-          // In MemberDM, we do not pass role/teamOwnerId since they're not defined.
           currentUser={currentUser}
         />
       )}
