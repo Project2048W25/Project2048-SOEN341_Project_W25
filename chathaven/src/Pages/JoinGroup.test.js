@@ -8,7 +8,7 @@ jest.mock('react-router-dom', () => ({
   MemoryRouter: ({ children }) => <div>{children}</div>,
 }));
 
-// Dummy Sidebar that simulates team selection and a join request flow.
+// This is a login test for Join Group
 const DummySidebar = () => {
   const [teamSelected, setTeamSelected] = useState(false);
   const [joinModalVisible, setJoinModalVisible] = useState(false);

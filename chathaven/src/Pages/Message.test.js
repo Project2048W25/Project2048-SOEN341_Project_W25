@@ -3,7 +3,7 @@ import React from 'react';
 import { render, screen, fireEvent } from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 
-// Dummy Chat component defined inline.
+// This is a login test for Message
 const DummyChat = () => (
   <div>
     <input placeholder="Type a message..." />

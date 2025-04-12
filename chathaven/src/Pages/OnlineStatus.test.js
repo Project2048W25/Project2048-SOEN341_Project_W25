@@ -3,7 +3,7 @@ import React from 'react';
 import { render, screen } from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 
-// Dummy OnlineStatus component defined inline.
+// This is a login test for Online status
 const DummyOnlineStatus = ({ status }) => (
   <div>{status.charAt(0).toUpperCase() + status.slice(1)}</div>
 );

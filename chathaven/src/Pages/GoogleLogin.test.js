@@ -10,7 +10,7 @@ const DummyGoogleLoginButton = () => (
   </button>
 );
 
-// Define a dummy googleLogin function.
+// This is a login test for Google login
 const dummyGoogleLogin = jest.fn();
 
 function simulateUserInteractionMetrics() {

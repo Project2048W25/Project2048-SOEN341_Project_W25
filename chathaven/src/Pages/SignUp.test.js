@@ -3,7 +3,7 @@ import React from 'react';
 import { render, screen } from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 
-// Dummy Signup component renders basic input fields.
+// This is a login test with for Sign up
 jest.mock('./Signup', () => {
   const React = require('react');
   return () => (
