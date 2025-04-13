@@ -26,8 +26,8 @@
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "tailwindcss-build": "npx @tailwindcss/cli -i src/root_index.css -o ./src/styles/tailwind.CSS/tailwind.css",
-    "tailwindcss-build-watch": "npx @tailwindcss/cli -i src/root_index.css -o ./src/styles/tailwind.CSS/tailwind.css --watch",
+    "tailwindcss-build": "npx @tailwindcss/cli -i src/styles/root_index.css -o ./src/styles/tailwind.CSS/tailwind.css",
+    "tailwindcss-build-watch": "npx @tailwindcss/cli -i src/styles/root_index.css -o ./src/styles/tailwind.CSS/tailwind.css --watch",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

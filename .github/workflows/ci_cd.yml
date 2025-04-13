@@ -1,18 +1,19 @@
-name: CI/CD Pipeline
+name: Continuous Integration, Delivery and Deployment (CI/CD) Pipeline
 
 on:
   push:
     branches:
-      - main
       - master
   pull_request:
     branches:
-      - main
       - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: chathaven
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -23,22 +24,28 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: cd chathaven &&  npm install
-        
-      - name: install CRA
-        run: cd chathaven && npm install react-scripts
+        run: npm ci
+
+      - name: Install CRA
+        run: npm ci react-scripts
+
       - name: Install Serve
-        run: cd chathaven && npm install -g serve
+        run: npm ci -g serve
 
       - name: Run ESLint
-        run:  cd chathaven && npx eslint . --ext .js,.jsx,.ts,.tsx || true
+        run: npx eslint . --ext .js,.jsx,.ts,.tsx || true
 
       - name: Run Stylelint
-        run:  cd chathaven && npx stylelint "**/*.{css,scss}" || true    
-
-      - name: Build React App in /chathaven
-        working-directory: chathaven
+        run: npx stylelint "**/*.{css,scss}" || true
+      - name: Run Tailwind CSS
         run: |
-          CI=false npm run build
+          npm install @tailwindcss/cli@4.1.3
+          npx @tailwindcss/cli -i ./src/styles/index.css -o ./styles/tailwind.CSS/tailwind.css --minify || true
+          npx npx @tailwindcss/cli -i ./src/styles/root_index.css -o ./styles/tailwind.CSS/tailwind.css --minify || true
+
+      - name: Build the project
+        run: |
+          CI=false 
+          npm run build
         env:
           NODE_ENV: production

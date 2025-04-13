@@ -1,5 +1,4 @@
-@import "../../node_modules/tailwindcss/dist/lib.d.mts"; /* 🌟 Import Tailwind CSS */
-
+@import "tailwindcss";
 /* 🌟 General Styles */
 body, html {
   height: 100%;

@@ -8,7 +8,7 @@
 
 ## Type of Change
 <!-- Please select the type of change that applies to this pull request. -->
-- [] Bug fix
+- [ ] Bug fix
 - [ ] New feature
 - [ ] Improvement
 - [ ] Documentation update
