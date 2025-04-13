@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import '../styles/tailwind.CSS/tailwind.css'
-import logo from "../../public/logo.svg";
+import logo from "../assets/logo.svg";
 import {ContextMenu} from "./ContextMenu";
 
 
