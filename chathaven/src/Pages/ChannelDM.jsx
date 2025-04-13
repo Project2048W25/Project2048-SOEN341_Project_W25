@@ -4,7 +4,7 @@ import { supabase } from "../utils/supabaseClient";
 import { createPortal } from "react-dom";
 import Picker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";
-import "./index.css";
+import "../styles/index.css";
 import { MdScheduleSend } from "react-icons/md";
 import { FiPaperclip } from "react-icons/fi";
 

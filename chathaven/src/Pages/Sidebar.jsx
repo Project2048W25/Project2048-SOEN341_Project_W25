@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
-import "./index.css";
+import "../styles/index.css";
 
 export const Sidebar = () => {
   // User & role state
