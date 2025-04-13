@@ -3,7 +3,7 @@ import { supabase } from "../utils/supabaseClient";
 import { Sidebar } from "./Sidebar";
 import { AdminView } from "./AdminView";
 import { MemberView } from "./MemberView";
-import "./index.css";
+import "../styles/index.css";
 
 export const AppChat = () => {
   const [role, setRole] = useState(null);

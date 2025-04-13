@@ -1,6 +1,6 @@
 import React from "react";
-import closedEye from "../icons/closed-eye.svg";
-import google_icon from "../icons/devicon_google.svg";
+import closedEye from "../assets/icons/closed-eye.svg";
+import google_icon from "../assets/icons/devicon_google.svg";
 import { signInWithEmail, signInWithGoogle } from "../services/authService";
 import { getProfileByUsername } from "../services/profileService";
 

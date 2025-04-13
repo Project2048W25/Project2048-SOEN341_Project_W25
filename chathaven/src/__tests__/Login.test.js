@@ -2,9 +2,10 @@
 import React from 'react';
 import { render, screen } from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
+import Login from "../Pages/Login";
 
 // This is a login test with email and password
-jest.mock('./Login', () => {
+jest.mock('../Pages/Login', () => {
   const React = require('react'); 
   return () => (
     <div>
@@ -13,7 +14,6 @@ jest.mock('./Login', () => {
     </div>
   );
 });
-import Login from "./Login";
 
 function recordLoggingData() {
   console.log("Recording logging data for Login test...");

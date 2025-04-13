@@ -1,3 +1,12 @@
-# https://www.robotstxt.org/robotstxt.html
+# robots.txt composition.
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /api/
+Disallow: /config/
+Disallow: /login/
+Disallow: /register/
+Disallow: /private/
+Allow: /
+
+# Sitemap location
+Sitemap: https://project2048-soen-341-project-w25.vercel.app/sitemap.xml
