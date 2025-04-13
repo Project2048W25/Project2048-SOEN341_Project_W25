@@ -18,12 +18,12 @@ Finding a secure and minimal platform for both team collaboration and private me
 
 | Name | Student ID| Role |
 |----------|----------|----------|
-| Gloria    |   40211953 | Front-end   |
-| Bertin   | 40157663 | Front-end  |
-| Kevin    | 40283037 | Full-stack |
-| Khaled    |  40231852  | Front-end    |
-| Vedang    |  40202302 | Front-end   |
-| William    | 40215391 | Back-end   |
+| Gloria (gloriaat)   |   40211953 | Front-end   |
+| Bertin (sanobertin)  | 40157663 | Front-end  |
+| Kevin (hkevint)  | 40283037 | Full-stack |
+| Khaled (KhaledDaoud9)  |  40231852  | Front-end    |
+| Vedang (dubey-vedu)    |  40202302 | Front-end   |
+| William (wmbx-28)   | 40215391 | Back-end   |
 
 ## Technologies Used
 1. **React** - For building the user interfaces.
