@@ -29,9 +29,6 @@ jobs:
       - name: Install CRA
         run: npm ci react-scripts
 
-      - name: Install Serve
-        run: npm ci -g serve
-
       - name: Run ESLint
         run: npx eslint . --ext .js,.jsx,.ts,.tsx || true
 
