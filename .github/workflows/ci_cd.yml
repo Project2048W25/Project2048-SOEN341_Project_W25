@@ -34,10 +34,7 @@ jobs:
         run:  cd chathaven && npx eslint . --ext .js,.jsx,.ts,.tsx || true
 
       - name: Run Stylelint
-        run:  cd chathaven && npx stylelint "**/*.{css,scss}" || true
-      - name: Compile Tailwindv4
-        run: cd chathaven && npm run tailwindcss-build
-        
+        run:  cd chathaven && npx stylelint "**/*.{css,scss}" || true    
 
       - name: Build React App in /chathaven
         working-directory: chathaven
