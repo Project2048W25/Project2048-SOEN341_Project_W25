@@ -1,5 +1,5 @@
 import React from "react";
-import { ReactComponent as TrashIcon } from "../icons/trash.svg";
+import { ReactComponent as TrashIcon } from "../../public/icons/trash.svg";
 import {createPortal} from "react-dom";
 
 // ✅ Simple Divider Component

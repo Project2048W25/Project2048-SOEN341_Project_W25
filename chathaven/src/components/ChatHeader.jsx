@@ -1,4 +1,4 @@
-import pending_message_icon from "../icons/pending_message_icon.svg";
+import pending_message_icon from "../../public/icons/pending_message_icon.svg";
 import React from "react";
 
 export const ChatHeader = () => {

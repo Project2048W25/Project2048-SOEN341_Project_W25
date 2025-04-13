@@ -1,7 +1,7 @@
 import React from "react";
 import '../styles/tailwind.CSS/tailwind.css'
-import logo from "../logo.svg";
-import more from "../icons/more.svg";
+import logo from "../../public/logo.svg";
+import more from "../../public/icons/more.svg";
 
 
 

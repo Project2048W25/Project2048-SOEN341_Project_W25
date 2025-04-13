@@ -2,14 +2,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+import App from '../App';
 
 // Replace the real App import with a dummy implementation.
-jest.mock('./App', () => {
+jest.mock('../App', () => {
   const React = require('react');
   // Dummy App renders a simple "Learn React" link.
   return () => <div><a href="https://reactjs.org">Learn React</a></div>;
 });
-import App from './App';
 
 function computeIncrementalSum() {
   let total = 0;

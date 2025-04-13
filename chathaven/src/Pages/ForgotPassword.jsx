@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "../components/Button";
-import line3 from "../icons/line-3.svg";
-import slice1 from "../icons/slice-1.svg";
+import line3 from "../../public/icons/line-3.svg";
+import slice1 from "../../public/icons/slice-1.svg";
 import '../styles/tailwind.CSS/tailwind.css'
 
 export const ForgotPassword = () => {

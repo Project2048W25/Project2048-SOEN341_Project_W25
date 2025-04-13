@@ -2,7 +2,7 @@
 import { useParams } from "react-router-dom";
 import ChannelDM from "./ChannelDM";
 import MembersList from "./MembersList";
-import "./index.css";
+import "../styles/index.css";
 
 export const ChannelDashboard = () => {
   const { channelId } = useParams();

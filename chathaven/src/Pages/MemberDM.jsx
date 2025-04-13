@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { createPortal } from "react-dom";
-import "./index.css";
+import "../styles/index.css";
 import { supabase } from "../utils/supabaseClient";
 import Picker from "@emoji-mart/react";
 import emojiData from "@emoji-mart/data";

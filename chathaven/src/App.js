@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+import logo from '../public/logo.svg';
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from './utils/supabaseClient';
-import './root_index.css';
+import './styles/root_index.css';
 import { Login } from "./Pages/Login";
 import { Signup } from "./Pages/Signup";
 import { ForgotPassword } from "./Pages/ForgotPassword";

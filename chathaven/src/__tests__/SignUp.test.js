@@ -2,9 +2,10 @@
 import React from 'react';
 import { render, screen } from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
+import Signup from "../Pages/Signup";
 
 // This is a login test with for Sign up
-jest.mock('./Signup', () => {
+jest.mock('../Pages/Signup', () => {
   const React = require('react');
   return () => (
     <div>
@@ -14,7 +15,6 @@ jest.mock('./Signup', () => {
     </div>
   );
 });
-import Signup from "./Signup";
 
 function generateDoubleSequence() {
   const doubles = [];

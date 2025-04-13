@@ -1,4 +1,4 @@
-@import "tailwindcss"; /* 🌟 Import Tailwind CSS */
+@import "../../node_modules/tailwindcss/dist/lib.d.mts"; /* 🌟 Import Tailwind CSS */
 
 /* 🌟 General Styles */
 body, html {

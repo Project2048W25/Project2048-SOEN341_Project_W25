@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
-import "./index.css";
+import "../styles/index.css";
 
 export const MembersList = ({ channelId }) => {
   const [channelCreatorId, setChannelCreatorId] = useState(null);

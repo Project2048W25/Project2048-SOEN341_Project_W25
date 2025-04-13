@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import google_icon from "../icons/devicon_google.svg";
+import google_icon from "../../public/icons/devicon_google.svg";
 import { signInWithGoogle } from "../services/authService";
 import { signUpUser } from "../services/userService";
 
